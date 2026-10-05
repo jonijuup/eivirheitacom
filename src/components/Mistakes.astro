@@ -1,0 +1,37 @@
+---
+// The episode's mistake count. When the corrections found a different number
+// than the intro promised, the promise is struck through: ~~5~~ 6.
+import { type Episode, mistakesFound } from "../data/episodes.ts";
+
+interface Props {
+  episode: Episode;
+}
+
+const { episode } = Astro.props;
+const found = mistakesFound(episode);
+---
+
+{
+  found === episode.mistakes ? (
+    found
+  ) : (
+    <span class="mistakes">
+      <span class="sr-only">Intro lupasi {episode.mistakes}, löytyi {found}</span>
+      <del aria-hidden="true">{episode.mistakes}</del> <ins aria-hidden="true">{found}</ins>
+    </span>
+  )
+}
+
+<style>
+  /* The promise, crossed out by hand; the real count beside it. */
+  del {
+    /* Dimmed by opacity, so it follows a row that inverts on hover. */
+    opacity: 0.55;
+    text-decoration: line-through;
+    text-decoration-thickness: 0.09em;
+  }
+
+  ins {
+    text-decoration: none;
+  }
+</style>

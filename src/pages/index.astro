@@ -1,5 +1,6 @@
 ---
 import Footer from "../components/Footer.astro";
+import Mistakes from "../components/Mistakes.astro";
 import Base from "../layouts/Base.astro";
 import {
   EPISODES,
@@ -9,6 +10,7 @@ import {
   formatDate,
   isoDuration,
   minutes,
+  mistakesFound,
   mistakesLabel,
   pad,
 } from "../data/episodes.ts";
@@ -17,7 +19,7 @@ import { ELSEWHERE, HOSTS, hostList, PLATFORMS, SITE } from "../data/site.ts";
 const latest = EPISODES[0];
 const totalMinutes = Math.round(EPISODES.reduce((sum, e) => sum + e.seconds, 0) / 60);
 const latestLinks = episodeLinks(latest, PLATFORMS).filter((p) => p.id !== "rss" && p.href);
-const totalMistakes = EPISODES.reduce((sum, e) => sum + e.mistakes, 0);
+const totalMistakes = EPISODES.reduce((sum, e) => sum + mistakesFound(e), 0);
 const abs = (p: string) => new URL(p, SITE.url).href;
 const rss = PLATFORMS.find((p) => p.id === "rss")?.href;
 
@@ -88,7 +90,7 @@ const jsonLd = {
         <dl class="facts">
           {latest.date && <div><dt>Julkaistu</dt><dd>{formatDate(latest.date)}</dd></div>}
           <div><dt>Kesto</dt><dd>{minutes(latest)} min</dd></div>
-          <div><dt>Virheitä</dt><dd>{latest.mistakes}</dd></div>
+          <div><dt>Virheitä</dt><dd><Mistakes episode={latest} /></dd></div>
         </dl>
         <div class="btns">
           {latestLinks.map((p) => <a class="btn" href={p.href} rel="noopener">{p.name}</a>)}
@@ -118,7 +120,7 @@ const jsonLd = {
                   <a href={episodeUrl(e)}>{e.title}</a>
                 </td>
                 <td class="num">{minutes(e)} min</td>
-                <td class="num">{e.mistakes}</td>
+                <td class="num"><Mistakes episode={e} /></td>
               </tr>
             ))
           }

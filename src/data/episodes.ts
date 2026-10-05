@@ -1,3 +1,5 @@
+import { NOTES } from "./notes.ts";
+
 // The episodes, newest first. For a new one: add its artwork to media/episodes/<nn>.png
 // (and to EPISODES in scripts/dither.mjs), its subtitles to content/transcripts/<nn>.srt,
 // and an entry here.
@@ -64,6 +66,9 @@ export const isoDuration = (e: Episode) => `PT${Math.floor(e.seconds / 60)}M${e.
 /** Where to listen to an episode: its own links, else the show's. */
 export const episodeLinks = (e: Episode, platforms: { id: string; name: string; href: string | null }[]) =>
   platforms.map((p) => ({ ...p, href: e.links?.[p.id as keyof NonNullable<Episode["links"]>] ?? p.href }));
+
+/** How many mistakes the corrections found, which need not be what the intro promised. */
+export const mistakesFound = (e: Episode) => NOTES[e.number]?.corrections.length ?? e.mistakes;
 
 /** "5 virhettä", "1 virhe". */
 export const mistakesLabel = (n: number) => `${n} ${n === 1 ? "virhe" : "virhettä"}`;

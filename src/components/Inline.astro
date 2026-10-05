@@ -1,0 +1,12 @@
+---
+// Text with inline Markdown links (see inline() in data/notes.ts).
+import { inline } from "../data/notes.ts";
+
+interface Props {
+  text: string;
+}
+
+const parts = inline(Astro.props.text);
+---
+
+{parts.map((p) => (p.href ? <a href={p.href} rel="noopener">{p.text}</a> : p.text))}

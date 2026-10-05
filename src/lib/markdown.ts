@@ -1,8 +1,19 @@
 // Plain-text versions of the site for agents and LLMs: each page as Markdown,
 // llms.txt (https://llmstxt.org) and llms-full.txt. The HTML pages say the same.
 
-import { EPISODES, type Episode, episodeLinks, episodeUrl, formatDate, minutes, mistakesLabel, pad } from "../data/episodes.ts";
+import {
+  EPISODES,
+  type Episode,
+  episodeLinks,
+  episodeUrl,
+  formatDate,
+  minutes,
+  mistakesFound,
+  mistakesLabel,
+  pad,
+} from "../data/episodes.ts";
 import { ELSEWHERE, HOSTS, hostList, PLATFORMS, SITE } from "../data/site.ts";
+import { NOTES } from "../data/notes.ts";
 import { timestamp, transcript } from "./transcript.ts";
 
 const abs = (path: string) => new URL(path, SITE.url).href;
@@ -13,13 +24,19 @@ const listen = (e?: Episode) =>
     .map((p) => (p.href ? `- [${p.name}](${p.href})` : `- ${p.name}: tulossa`))
     .join("\n");
 
+/** "5", or "~~5~~ 6 (intro lupasi 5, löytyi 6)" when the corrections found a different number. */
+const mistakesMd = (e: Episode) => {
+  const found = mistakesFound(e);
+  return found === e.mistakes ? `${found}` : `~~${e.mistakes}~~ ${found} (intro lupasi ${e.mistakes}, löytyi ${found})`;
+};
+
 const facts = (e: Episode) =>
   [
     `- Jakso: ${pad(e.number)}`,
     e.date ? `- Julkaistu: ${formatDate(e.date)}` : null,
     e.recorded ? `- Nauhoitettu: ${formatDate(e.recorded)}` : null,
     `- Kesto: ${Math.floor(e.seconds / 60)}:${String(e.seconds % 60).padStart(2, "0")}`,
-    `- Virheitä: ${e.mistakes}`,
+    `- Virheitä: ${mistakesMd(e)}`,
     `- Keskustelijat: ${hostList()}`,
     `- Sivu: ${abs(episodeUrl(e))}`,
   ]
@@ -43,11 +60,37 @@ ${ELSEWHERE.map((n) => `- [${n.name}](${n.href}): ${n.note}`).join("\n")}
 
 ## Jaksot
 
-${EPISODES.map((e) => `- [${pad(e.number)} ${e.title}](${abs(episodeMd(e))}): ${e.description} (${minutes(e)} min, ${mistakesLabel(e.mistakes)})`).join("\n")}
+${EPISODES.map((e) => `- [${pad(e.number)} ${e.title}](${abs(episodeMd(e))}): ${e.description} (${minutes(e)} min, ${mistakesLabel(mistakesFound(e))})`).join("\n")}
 
 ## Kuuntele
 
 ${listen()}
+`;
+}
+
+/** Corrections, glossary and sources, as on the episode page (the page folds them away; here they are open). */
+function notesMd(e: Episode) {
+  const n = NOTES[e.number];
+  if (!n) return "";
+  const youtube = e.links?.youtube;
+  const at = (t: number) => (youtube ? ` ([YouTube ${timestamp(t)}](${youtube}&t=${t}s))` : ` [${timestamp(t)}]`);
+  const item = (label: string, c: { time: number; claim: string; body: string[] }) =>
+    `### ${label}: ${c.claim}${at(c.time)}\n\n${c.body.join("\n\n")}`;
+  return `
+## Virheet ja oikaisut (${n.corrections.length})
+
+Sisältää spoilereita.
+
+${n.corrections.map((c, i) => item(`Virhe ${i + 1}`, c)).join("\n\n")}
+${n.clarifications.map((c) => `\n${item("Ei virhe", c)}`).join("\n")}
+
+## Sanasto
+
+${n.glossary.map((g) => `- **${g.term}**: ${g.text}`).join("\n")}
+
+## Lähteet
+
+${n.sources.map((s) => `- ${s}`).join("\n")}
 `;
 }
 
@@ -66,7 +109,7 @@ ${e.topics.map((t) => `- ${t}`).join("\n")}
 ## Kuuntele
 
 ${listen(e)}
-${
+${notesMd(e)}${
   lines.length
     ? `
 ## Litterointi

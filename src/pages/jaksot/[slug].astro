@@ -1,6 +1,8 @@
 ---
 import type { GetStaticPaths } from "astro";
 import Footer from "../../components/Footer.astro";
+import Inline from "../../components/Inline.astro";
+import Mistakes from "../../components/Mistakes.astro";
 import Base from "../../layouts/Base.astro";
 import {
   EPISODES,
@@ -14,6 +16,7 @@ import {
   minutes,
   pad,
 } from "../../data/episodes.ts";
+import { NOTES } from "../../data/notes.ts";
 import { HOSTS, hostList, PLATFORMS, SITE } from "../../data/site.ts";
 import { episodeMd } from "../../lib/markdown.ts";
 import { timestamp, transcript } from "../../lib/transcript.ts";
@@ -34,6 +37,19 @@ const { episode: e, newer, older } = Astro.props;
 const lines = e.transcript ? transcript(e.transcript) : [];
 const abs = (p: string) => new URL(p, SITE.url).href;
 const links = episodeLinks(e, PLATFORMS).filter((p) => p.id !== "rss");
+const notes = NOTES[e.number];
+
+/** The episode on YouTube, started at a moment. */
+const youtubeAt = (t: number) => {
+  if (!e.links?.youtube) return null;
+  const url = new URL(e.links.youtube);
+  url.searchParams.set("t", `${t}s`);
+  return url.href;
+};
+
+/** Section numbers, in the order the sections appear. */
+const sections = ["tassa", notes && "virheet", notes && "sanasto", lines.length && "litterointi"].filter(Boolean);
+const no = (id: string) => pad(sections.indexOf(id) + 1);
 
 const jsonLd = {
   "@context": "https://schema.org",
@@ -62,7 +78,8 @@ const jsonLd = {
   jsonLd={jsonLd}
   keys={[
     { key: "4", name: "Kuuntele", href: "#kuuntele" },
-    ...(lines.length ? [{ key: "5", name: "Litterointi", href: "#litterointi" }] : []),
+    ...(notes ? [{ key: "5", name: "Virheet", href: "#virheet" }] : []),
+    ...(lines.length ? [{ key: notes ? "6" : "5", name: "Litterointi", href: "#litterointi" }] : []),
   ]}
 >
   <article>
@@ -73,7 +90,7 @@ const jsonLd = {
         {e.date && <div><dt>Julkaistu</dt><dd>{formatDate(e.date)}</dd></div>}
         {e.recorded && <div><dt>Nauhoitettu</dt><dd>{formatDate(e.recorded)}</dd></div>}
         <div><dt>Kesto</dt><dd>{minutes(e)} min</dd></div>
-        <div><dt>Virheitä</dt><dd>{e.mistakes}</dd></div>
+        <div><dt>Virheitä</dt><dd><Mistakes episode={e} /></dd></div>
         <div><dt>Keskustelijat</dt><dd>{hostList()}</dd></div>
       </dl>
       <div class="listen" id="kuuntele">
@@ -99,7 +116,7 @@ const jsonLd = {
     </div>
 
     <section class="wrap" aria-labelledby="tassa-jaksossa">
-      <div class="head"><span class="label no">01</span><h2 id="tassa-jaksossa">Tässä jaksossa</h2></div>
+      <div class="head"><span class="label no">{no("tassa")}</span><h2 id="tassa-jaksossa">Tässä jaksossa</h2></div>
       <div class="body grid">
         <p class="desc">{e.description}</p>
         <ol class="topics">
@@ -109,24 +126,112 @@ const jsonLd = {
     </section>
 
     {
+      notes && (
+        <section class="wrap" id="virheet" aria-labelledby="virheet-otsikko">
+          <div class="head">
+            <span class="label no">{no("virheet")}</span>
+            <h2 id="virheet-otsikko">Virheet ja oikaisut ({notes.corrections.length})</h2>
+          </div>
+          <div class="grid">
+            <p class="note dim">Sisältää spoilereita.</p>
+            <div class="fixes">
+              {
+                [
+                  { label: null, items: notes.corrections.map((c, i) => ({ ...c, n: pad(i + 1) })) },
+                  { label: "Ei virhe, vaikka kuulostaa siltä", items: notes.clarifications.map((c) => ({ ...c, n: "+" })) },
+                ]
+                  .filter((g) => g.items.length > 0)
+                  .map((g) => (
+                    <div>
+                      {g.label && <p class="label sub">{g.label}</p>}
+                      <ol class="items">
+                        {g.items.map((c) => (
+                          <li>
+                            <details class="item">
+                              <summary>
+                                <span class="n dim">{c.n}</span>
+                                <span class="claim">{c.claim}</span>
+                              </summary>
+                              <div class="fix quiet">
+                                {c.body.map((b) => <p><Inline text={b} /></p>)}
+                              </div>
+                            </details>
+                            {
+                              youtubeAt(c.time) ? (
+                                <a class="t" href={youtubeAt(c.time)} rel="noopener" aria-label={`Katso YouTubessa kohdasta ${timestamp(c.time)}`}>
+                                  {timestamp(c.time)}
+                                </a>
+                              ) : (
+                                <span class="t dim">{timestamp(c.time)}</span>
+                              )
+                            }
+                          </li>
+                        ))}
+                      </ol>
+                    </div>
+                  ))
+              }
+            </div>
+          </div>
+        </section>
+      )
+    }
+
+    {
+      notes && (
+        <section class="wrap" id="sanasto" aria-labelledby="sanasto-otsikko">
+          <div class="head">
+            <span class="label no">{no("sanasto")}</span>
+            <h2 id="sanasto-otsikko">Sanasto ja lähteet</h2>
+          </div>
+          <div class="grid refs">
+            <div class="refs-glossary">
+              <h3 class="label">Sanasto</h3>
+              <dl class="glossary">
+                {notes.glossary.map((g) => (
+                  <div>
+                    <dt>{g.term}</dt>
+                    <dd class="quiet"><Inline text={g.text} /></dd>
+                  </div>
+                ))}
+              </dl>
+            </div>
+            <div class="refs-sources" id="lahteet">
+              <h3 class="label">Lähteet</h3>
+              <ul class="sources quiet">
+                {notes.sources.map((s) => <li><Inline text={s} /></li>)}
+              </ul>
+            </div>
+          </div>
+        </section>
+      )
+    }
+
+    {
       lines.length > 0 && (
         <section class="wrap" id="litterointi" aria-labelledby="litterointi-otsikko">
           <div class="head">
-            <span class="label no">02</span>
+            <span class="label no">{no("litterointi")}</span>
             <h2 id="litterointi-otsikko">Litterointi</h2>
           </div>
           <div class="grid">
             <p class="note dim">
               Konetekstitys, joten siinä on virheitä. Puhujia ei ole merkitty. Myös <a href={episodeMd(e)}>Markdownina</a>.
             </p>
-            <div class="transcript quiet">
-              {lines.map((p) => (
-                <p id={`t${Math.floor(p.start)}`}>
-                  <a class="ts dim" href={`#t${Math.floor(p.start)}`}>{timestamp(p.start)}</a>
-                  <span>{p.text}</span>
-                </p>
-              ))}
-            </div>
+            <details class="more" data-transcript>
+              <summary class="btn">
+                <span class="closed">Näytä litterointi</span>
+                <span class="opened">Piilota litterointi</span>
+              </summary>
+              <div class="transcript quiet">
+                {lines.map((p) => (
+                  <p id={`t${Math.floor(p.start)}`}>
+                    <a class="ts dim" href={`#t${Math.floor(p.start)}`}>{timestamp(p.start)}</a>
+                    <span>{p.text}</span>
+                  </p>
+                ))}
+              </div>
+            </details>
           </div>
         </section>
       )
@@ -144,6 +249,20 @@ const jsonLd = {
 
   <Footer slot="footer" />
 </Base>
+
+<script>
+  // A link to a moment in the transcript (#t123) opens it first.
+  const openFor = () => {
+    const target = location.hash.length > 1 ? document.getElementById(location.hash.slice(1)) : null;
+    const fold = target?.closest<HTMLDetailsElement>("details[data-transcript]");
+    if (fold && !fold.open) {
+      fold.open = true;
+      target?.scrollIntoView();
+    }
+  };
+  openFor();
+  addEventListener("hashchange", openFor);
+</script>
 
 <style>
   .ep {
@@ -204,8 +323,31 @@ const jsonLd = {
     top: 120px;
   }
 
-  .transcript {
+  /* The transcript is folded away for people; it is in the page all the same, for search and agents. */
+  .more {
     grid-column: 4 / span 8;
+  }
+
+  .more > summary {
+    width: max-content;
+    cursor: pointer;
+    list-style: none;
+  }
+
+  .more .opened,
+  .more[open] > summary .closed {
+    display: none;
+  }
+
+  .more[open] > summary .opened {
+    display: inline;
+  }
+
+  .more[open] > summary {
+    margin-bottom: 32px;
+  }
+
+  .transcript {
     display: grid;
     gap: 1.1em;
     max-width: 72ch;
@@ -230,6 +372,145 @@ const jsonLd = {
     text-shadow: none;
   }
 
+  /* --- Corrections, glossary, sources: in the transcript's column, beside a margin note --- */
+  .fixes {
+    grid-column: 4 / span 8;
+    display: grid;
+    gap: 28px;
+    max-width: 76ch;
+  }
+
+  summary::-webkit-details-marker {
+    display: none;
+  }
+
+  .items {
+    padding: 0;
+    list-style: none;
+    border-top: 1px solid var(--rule);
+  }
+
+  /* The claim opens its correction; the time on the right opens the video there. */
+  .items li {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    column-gap: 16px;
+    align-items: start;
+    border-bottom: 1px solid var(--rule);
+  }
+
+  .sub {
+    margin: 16px 0 12px;
+  }
+
+  /* A mistake: number, claim and time on one row; the correction opens under it. */
+  .item > summary {
+    display: grid;
+    grid-template-columns: 4ch 1fr;
+    gap: 16px;
+    padding: 16px 0;
+    cursor: pointer;
+    list-style: none;
+  }
+
+  .item > summary:hover .claim,
+  .item[open] > summary .claim {
+    background: var(--phosphor);
+    color: var(--black);
+    text-shadow: none;
+  }
+
+  .item > summary .claim {
+    justify-self: start;
+  }
+
+  .item > summary .claim::after {
+    content: " +";
+    color: inherit;
+  }
+
+  .item[open] > summary .claim::after {
+    content: " −";
+  }
+
+  .t {
+    padding-top: 16px;
+    font-variant-numeric: tabular-nums;
+    color: var(--dim);
+    text-decoration: none;
+  }
+
+  a.t:hover {
+    background: var(--phosphor);
+    color: var(--black);
+    text-shadow: none;
+  }
+
+  .fix {
+    display: grid;
+    gap: 0.9em;
+    padding: 0 0 24px calc(4ch + 16px);
+  }
+
+  .fix a,
+  .sources a {
+    text-decoration-color: var(--faint);
+  }
+
+  /* Glossary and sources side by side on a large screen, one under the other below that. */
+  .refs {
+    row-gap: 64px;
+  }
+
+  .refs-glossary {
+    grid-column: 1 / span 7;
+  }
+
+  .refs-sources {
+    grid-column: 9 / span 4;
+  }
+
+  .refs h3 {
+    margin-bottom: 14px;
+    font-weight: 400;
+    letter-spacing: 0.08em;
+  }
+
+  @media (max-width: 1100px) {
+    .refs-glossary,
+    .refs-sources {
+      grid-column: 1 / -1;
+    }
+  }
+
+  .glossary {
+    display: grid;
+    border-top: 1px solid var(--rule);
+  }
+
+  .glossary div {
+    display: grid;
+    grid-template-columns: 16ch 1fr;
+    gap: 16px;
+    padding: 14px 0;
+    border-bottom: 1px solid var(--rule);
+  }
+
+  .sources {
+    display: grid;
+    gap: 0;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    border-top: 1px solid var(--rule);
+    font-size: var(--t-small);
+  }
+
+  .sources li {
+    padding: 10px 0;
+    border-bottom: 1px solid var(--rule);
+  }
+
   .pager {
     display: flex;
     justify-content: space-between;
@@ -252,7 +533,8 @@ const jsonLd = {
     .desc,
     .topics,
     .note,
-    .transcript {
+    .fixes,
+    .more {
       grid-column: 1 / -1;
     }
 
@@ -264,6 +546,20 @@ const jsonLd = {
     .transcript p {
       grid-template-columns: 1fr;
       gap: 2px;
+    }
+
+    .item > summary {
+      grid-template-columns: 3ch 1fr;
+      gap: 12px;
+    }
+
+    .fix {
+      padding-left: calc(3ch + 12px);
+    }
+
+    .glossary div {
+      grid-template-columns: 1fr;
+      gap: 4px;
     }
   }
 </style>
