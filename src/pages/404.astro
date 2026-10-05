@@ -1,0 +1,31 @@
+---
+import Base from "../layouts/Base.astro";
+---
+
+<Base title="Virhe 404" description="Sivua ei löytynyt." path={[{ name: "404" }]} noindex>
+  <section class="wrap missing">
+    <p class="label">Virhe 404</p>
+    <h1>Väärä komento tai tiedostonimi.</h1>
+    <p class="lead dim">Tällä sivulla on yksi virhe.</p>
+    <p><a class="btn" href="/">Takaisin etusivulle <span aria-hidden="true">→</span></a></p>
+  </section>
+</Base>
+
+<style>
+  .missing {
+    display: grid;
+    align-content: center;
+    gap: 28px;
+    min-height: 100svh;
+    padding-block: 160px;
+  }
+
+  h1 {
+    font-size: clamp(2.5rem, 1rem + 6vw, 8rem);
+    max-width: 14ch;
+  }
+
+  .lead {
+    font-size: var(--t-lead);
+  }
+</style>

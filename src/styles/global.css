@@ -1,0 +1,539 @@
+/* Ei virheitä: the intro's CRT as a web page.
+ *
+ * The page is the tube's face. Text is real text, lit in phosphor with a soft
+ * glow and red/blue fringes (red lands a little left, blue a little right, as
+ * in the intro's shader). A fixed overlay adds what the glass does: phosphor
+ * dots, the rounded screen edge, a vignette and a slow roll bar. Type is
+ * IBM Plex Mono on a Swiss grid: large, left-aligned, few sizes. */
+
+:root {
+  color-scheme: dark;
+
+  --glass: #0b0c0b;
+  --black: #040404;
+  --phosphor: #fff9f0;
+  --dim: rgb(255 249 240 / 0.56);
+  --faint: rgb(255 249 240 / 0.32);
+  --rule: rgb(255 249 240 / 0.14);
+  --halo: rgb(255 234 208 / 0.34);
+  --halo-wide: rgb(255 226 192 / 0.14);
+  --red: rgb(255 72 48 / 0.5);
+  --blue: rgb(64 150 255 / 0.5);
+
+  --mono: "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, monospace;
+
+  /* The grid: 12 columns, gutters at the side of the tube. */
+  --gutter: clamp(16px, 4vw, 56px);
+  --gap: clamp(16px, 2vw, 32px);
+  --max: 1680px;
+
+  /* Sizes: few, far apart. */
+  --t-small: 0.8125rem;
+  --t-body: clamp(1rem, 0.95rem + 0.2vw, 1.125rem);
+  --t-lead: clamp(1.25rem, 1rem + 1vw, 1.75rem);
+  --t-statement: clamp(1.75rem, 1.1rem + 2.6vw, 3.5rem);
+  --t-title: clamp(2.5rem, 1.2rem + 5.4vw, 7rem);
+  --t-logo: clamp(4rem, 13.6vw, 17rem);
+
+  --bar: 44px;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  background: var(--black);
+  scroll-behavior: smooth;
+  scroll-padding-top: 96px;
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  margin: 0;
+  min-height: 100svh;
+  color: var(--phosphor);
+  font-family: var(--mono);
+  font-size: var(--t-body);
+  line-height: 1.55;
+  font-kerning: normal;
+  -webkit-font-smoothing: antialiased;
+  /* The glass is never black: a faint phosphor floor, lit a little more in the middle. */
+  background:
+    radial-gradient(120% 90% at 50% 42%, #151615 0%, var(--glass) 48%, #070707 82%, var(--black) 100%) fixed,
+    var(--black);
+  overflow-x: hidden;
+}
+
+/* --- Phosphor ------------------------------------------------------------ */
+
+/* Text glows and fringes. The fringe grows with the type, about 1.4 px on 1080p body text. */
+body {
+  --f: max(0.6px, 0.012em);
+  text-shadow:
+    calc(-1 * var(--f)) 0 0 var(--red),
+    var(--f) 0 0 var(--blue),
+    0 0 0.35em var(--halo),
+    0 0 1.2em var(--halo-wide);
+}
+
+/* Long reading gets a lighter beam, so it stays crisp. */
+.quiet {
+  text-shadow:
+    -0.6px 0 0 rgb(255 72 48 / 0.32),
+    0.6px 0 0 rgb(64 150 255 / 0.32),
+    0 0 6px rgb(255 234 208 / 0.22);
+}
+
+::selection {
+  background: var(--phosphor);
+  color: var(--black);
+  text-shadow: none;
+}
+
+a {
+  color: inherit;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.2em;
+}
+
+:focus-visible {
+  outline: 2px solid var(--phosphor);
+  outline-offset: 4px;
+  box-shadow: 0 0 16px var(--halo);
+}
+
+h1,
+h2,
+h3,
+p,
+ol,
+ul,
+dl,
+dd,
+figure {
+  margin: 0;
+}
+
+h1,
+h2,
+h3 {
+  font-weight: 400;
+  line-height: 1.02;
+  letter-spacing: -0.035em;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* --- The grid ------------------------------------------------------------ */
+
+.wrap {
+  width: 100%;
+  max-width: var(--max);
+  margin: 0 auto;
+  padding-inline: var(--gutter);
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  column-gap: var(--gap);
+}
+
+/* Small labels: section numbers, eyebrows, table heads. */
+.label {
+  font-size: var(--t-small);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--dim);
+}
+
+.dim {
+  color: var(--dim);
+}
+
+/* --- Chrome: the prompt line on top, function keys at the bottom ---------- */
+
+.top,
+.keys {
+  position: fixed;
+  left: 0;
+  right: 0;
+  z-index: 30;
+  font-size: var(--t-small);
+}
+
+.top {
+  top: 0;
+  padding-top: clamp(18px, 2.4vw, 32px);
+}
+
+.top .wrap {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--gap);
+}
+
+.prompt {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.prompt a {
+  text-decoration: none;
+}
+
+.prompt a:hover {
+  background: var(--phosphor);
+  color: var(--black);
+  text-shadow: none;
+}
+
+.prompt .sep {
+  color: var(--faint);
+}
+
+.cursor {
+  display: inline-block;
+  width: 0.6em;
+  height: 1.15em;
+  margin-left: 0.15em;
+  background: var(--phosphor);
+  box-shadow: 0 0 10px var(--halo);
+  vertical-align: -0.2em;
+  animation: blink 1s steps(1) infinite;
+}
+
+.top .tagline {
+  color: var(--dim);
+  white-space: nowrap;
+}
+
+.keys {
+  bottom: 0;
+  padding-bottom: clamp(14px, 2vw, 26px);
+}
+
+.keys ol {
+  display: flex;
+  gap: clamp(10px, 2vw, 28px);
+  padding: 0;
+  list-style: none;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.keys a {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.5em;
+  padding: 2px 0;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.keys kbd {
+  font-family: inherit;
+  color: var(--phosphor);
+}
+
+.keys .name {
+  padding: 1px 0.55em;
+  color: var(--dim);
+  outline: 1px solid var(--rule);
+}
+
+.keys a:hover .name,
+.keys a[aria-current="true"] .name {
+  background: var(--phosphor);
+  color: var(--black);
+  outline-color: var(--phosphor);
+  text-shadow: none;
+  box-shadow: 0 0 14px var(--halo);
+}
+
+/* --- The tube: fades, glass, dots, roll ---------------------------------- */
+
+/* The picture fades to black at the top and bottom of the screen. */
+.fade {
+  position: fixed;
+  left: 0;
+  right: 0;
+  z-index: 20;
+  height: clamp(96px, 16vh, 180px);
+  pointer-events: none;
+}
+
+.fade-top {
+  top: 0;
+  background: linear-gradient(var(--black) 22%, rgb(4 4 4 / 0.85) 45%, transparent);
+}
+
+.fade-bottom {
+  bottom: 0;
+  background: linear-gradient(transparent, rgb(4 4 4 / 0.85) 55%, var(--black) 78%);
+}
+
+.crt {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  pointer-events: none;
+}
+
+.crt > * {
+  position: absolute;
+  inset: 0;
+}
+
+/* Phosphor dots on a 4 px pitch: invisible on the dark glass, a texture on everything lit. */
+.crt-dots {
+  background-image: radial-gradient(circle at 50% 50%, transparent 0 34%, rgb(0 0 0 / 0.5) 72%);
+  background-size: 4px 4px;
+  mix-blend-mode: multiply;
+  opacity: 0.3;
+}
+
+/* Every other line a little darker, softly. */
+.crt-lines {
+  background: repeating-linear-gradient(to bottom, transparent 0 2px, rgb(0 0 0 / 0.1) 3px, transparent 4px);
+  mix-blend-mode: multiply;
+}
+
+/* A slow roll bar, as when a CRT is filmed. */
+.crt-roll {
+  inset: -40vh 0 auto;
+  height: 40vh;
+  background: linear-gradient(transparent, rgb(255 249 240 / 0.022) 50%, transparent);
+  mix-blend-mode: screen;
+  animation: roll 11s linear infinite;
+}
+
+/* The glass: darker towards the edges, and the screen's rounded rectangle against the black case. */
+.crt-glass {
+  inset: clamp(4px, 0.6vw, 10px);
+  border-radius: clamp(14px, 2.2vw, 36px);
+  box-shadow:
+    0 0 0 60px var(--black),
+    inset 0 0 0 1px rgb(255 249 240 / 0.035),
+    inset 0 0 clamp(40px, 8vw, 140px) clamp(10px, 2vw, 40px) rgb(0 0 0 / 0.62);
+}
+
+@keyframes roll {
+  to {
+    transform: translateY(180vh);
+  }
+}
+
+@keyframes blink {
+  50% {
+    opacity: 0;
+  }
+}
+
+/* --- Content ------------------------------------------------------------- */
+
+main {
+  position: relative;
+  z-index: 1;
+}
+
+section {
+  padding-block: clamp(96px, 14vw, 220px) 0;
+}
+
+/* Section head: number and name over a rule, Swiss style. */
+.head {
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  column-gap: var(--gap);
+  padding-top: 14px;
+  border-top: 1px solid var(--rule);
+  margin-bottom: clamp(40px, 6vw, 96px);
+}
+
+.head .no {
+  grid-column: span 2;
+}
+
+.head h2 {
+  grid-column: span 10;
+  font-size: var(--t-small);
+  letter-spacing: 0.08em;
+  line-height: inherit;
+  text-transform: uppercase;
+  color: var(--dim);
+}
+
+/* Buttons, DOS style: a bracketed label that inverts, like a selected menu item. */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6em;
+  padding: 0.55em 0.9em;
+  border: 1px solid var(--rule);
+  font: inherit;
+  color: var(--phosphor);
+  text-decoration: none;
+  white-space: nowrap;
+  background: transparent;
+  transition:
+    background 80ms,
+    color 80ms;
+}
+
+.btn:hover {
+  background: var(--phosphor);
+  color: var(--black);
+  border-color: var(--phosphor);
+  text-shadow: none;
+  box-shadow:
+    0 0 18px var(--halo),
+    -1px 0 0 var(--red),
+    1px 0 0 var(--blue);
+}
+
+.btn[aria-disabled="true"] {
+  color: var(--faint);
+  border-style: dashed;
+  pointer-events: none;
+}
+
+.btn .arrow {
+  color: inherit;
+}
+
+.btns {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+/* Dithered artwork: hard pixels, lit like the text. Dark pixels are transparent, so the glow follows the dots. */
+.dither {
+  display: block;
+  width: 100%;
+  height: auto;
+  image-rendering: pixelated;
+  filter: drop-shadow(-1px 0 0 var(--red)) drop-shadow(1px 0 0 var(--blue)) drop-shadow(0 0 5px var(--halo));
+  transition: filter 300ms;
+}
+
+a:hover .dither,
+.dither-frame:hover .dither {
+  filter: drop-shadow(-1.5px 0 0 var(--red)) drop-shadow(1.5px 0 0 var(--blue)) drop-shadow(0 0 10px rgb(255 234 208 / 0.6));
+}
+
+/* Facts in a row: small label over value. */
+.facts {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px clamp(24px, 3vw, 48px);
+}
+
+.facts div {
+  display: grid;
+  gap: 2px;
+}
+
+.facts dt {
+  font-size: var(--t-small);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--dim);
+}
+
+/* --- Footer -------------------------------------------------------------- */
+
+.foot {
+  position: relative;
+  z-index: 1;
+  padding-block: clamp(120px, 16vw, 240px) calc(var(--bar) + clamp(120px, 16vh, 200px));
+}
+
+.foot .wrap {
+  display: grid;
+  gap: var(--gap);
+}
+
+.foot .big {
+  font-size: var(--t-title);
+  line-height: 1;
+  letter-spacing: -0.04em;
+  text-decoration: none;
+}
+
+.foot .big:hover {
+  background: var(--phosphor);
+  color: var(--black);
+  text-shadow: none;
+}
+
+.foot .small {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 8px 24px;
+  padding-top: 14px;
+  border-top: 1px solid var(--rule);
+  font-size: var(--t-small);
+  color: var(--dim);
+}
+
+.foot .small a {
+  color: var(--dim);
+}
+
+/* --- Small screens --------------------------------------------------------- */
+
+@media (max-width: 760px) {
+  .top .tagline {
+    display: none;
+  }
+
+  .head .no {
+    grid-column: span 3;
+  }
+
+  /* No number keys on a phone: the bar is plain navigation. */
+  .keys kbd {
+    display: none;
+  }
+
+  .keys ol {
+    gap: 6px;
+  }
+
+  .head h2 {
+    grid-column: span 9;
+  }
+}
+
+/* --- Motion -------------------------------------------------------------- */
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  .crt-roll {
+    display: none;
+  }
+
+  .cursor {
+    animation: none;
+  }
+}

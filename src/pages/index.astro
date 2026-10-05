@@ -1,0 +1,601 @@
+---
+import Footer from "../components/Footer.astro";
+import Base from "../layouts/Base.astro";
+import {
+  EPISODES,
+  episodeImage,
+  episodeLinks,
+  episodeOg,
+  episodeUrl,
+  formatDate,
+  isoDuration,
+  minutes,
+  mistakesLabel,
+  pad,
+} from "../data/episodes.ts";
+import { ELSEWHERE, HOSTS, hostList, PLATFORMS, SITE } from "../data/site.ts";
+
+const latest = EPISODES[0];
+const totalMinutes = Math.round(EPISODES.reduce((sum, e) => sum + e.seconds, 0) / 60);
+const latestLinks = episodeLinks(latest, PLATFORMS).filter((p) => p.id !== "rss" && p.href);
+const totalMistakes = EPISODES.reduce((sum, e) => sum + e.mistakes, 0);
+const abs = (p: string) => new URL(p, SITE.url).href;
+const rss = PLATFORMS.find((p) => p.id === "rss")?.href;
+
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "PodcastSeries",
+  name: SITE.name,
+  description: SITE.description,
+  url: SITE.url,
+  inLanguage: SITE.lang,
+  image: abs(episodeOg(latest)),
+  ...(rss ? { webFeed: rss } : {}),
+  sameAs: PLATFORMS.filter((p) => p.id !== "rss" && p.href).map((p) => p.href),
+  author: HOSTS.map((h) => ({
+    "@type": "Person",
+    name: h.name,
+    jobTitle: h.role,
+    sameAs: [h.linkedin],
+    worksFor: { "@type": "Organization", name: h.company.name, url: h.company.href },
+  })),
+  episode: EPISODES.map((e) => ({
+    "@type": "PodcastEpisode",
+    episodeNumber: e.number,
+    name: e.title,
+    description: e.description,
+    url: abs(episodeUrl(e)),
+    duration: isoDuration(e),
+    ...(e.date ? { datePublished: e.date } : {}),
+  })),
+};
+---
+
+<Base title={SITE.name} description={SITE.description} markdown="/index.md" image={episodeOg(latest)} jsonLd={jsonLd}>
+  <section class="hero wrap" id="top">
+    <div class="hero-top grid">
+      <p class="label">Podcast</p>
+      <p class="label count">Jaksoja {pad(EPISODES.length)}</p>
+    </div>
+
+    <script is:inline>
+      if (!matchMedia("(prefers-reduced-motion: reduce)").matches) document.documentElement.classList.add("typer-pending");
+    </script>
+    <h1 class="logo" aria-label="Ei virheitä">
+      <span class="typed" data-typer aria-hidden="true">Ei virheitä<span class="caret"></span></span>
+    </h1>
+
+    <div class="hero-foot grid">
+      <p class="lead">{hostList()} puhuvat tekoälystä ja teknologiasta.</p>
+      <a class="latest" href={episodeUrl(latest)}>
+        <span class="label">Uusin jakso</span>
+        <span class="latest-title"><span class="dim">{pad(latest.number)}</span> {latest.title}</span>
+        <span class="arrow" aria-hidden="true">→</span>
+      </a>
+    </div>
+  </section>
+
+  <section id="jaksot" class="wrap">
+    <div class="head"><span class="label no">01</span><h2>Jaksot</h2></div>
+
+    <article class="feature grid">
+      <a class="feature-art dither-frame" href={episodeUrl(latest)} tabindex="-1" aria-hidden="true">
+        <img class="dither" src={episodeImage(latest)} width="560" height="315" alt="" />
+      </a>
+      <div class="feature-text">
+        <p class="label">Jakso {pad(latest.number)}</p>
+        <h3><a href={episodeUrl(latest)}>{latest.title}</a></h3>
+        <p class="quiet">{latest.description}</p>
+        <dl class="facts">
+          {latest.date && <div><dt>Julkaistu</dt><dd>{formatDate(latest.date)}</dd></div>}
+          <div><dt>Kesto</dt><dd>{minutes(latest)} min</dd></div>
+          <div><dt>Virheitä</dt><dd>{latest.mistakes}</dd></div>
+        </dl>
+        <div class="btns">
+          {latestLinks.map((p) => <a class="btn" href={p.href} rel="noopener">{p.name}</a>)}
+        </div>
+        <a class="more" href={episodeUrl(latest)}>Jakson sivu ja litterointi <span aria-hidden="true">→</span></a>
+      </div>
+    </article>
+
+    <div class="dir">
+      <p class="dir-prompt dim" aria-hidden="true">C:\EIVIRHEITA\JAKSOT&gt; dir</p>
+      <table>
+        <caption class="sr-only">Kaikki jaksot</caption>
+        <thead>
+          <tr class="label">
+            <th scope="col">Nro</th>
+            <th scope="col">Nimi</th>
+            <th scope="col" class="num">Kesto</th>
+            <th scope="col" class="num">Virheitä</th>
+          </tr>
+        </thead>
+        <tbody>
+          {
+            EPISODES.map((e) => (
+              <tr>
+                <td>{pad(e.number)}</td>
+                <td>
+                  <a href={episodeUrl(e)}>{e.title}</a>
+                </td>
+                <td class="num">{minutes(e)} min</td>
+                <td class="num">{e.mistakes}</td>
+              </tr>
+            ))
+          }
+        </tbody>
+      </table>
+      <p class="dir-total dim">
+        {EPISODES.length} jakso(a) &nbsp; {totalMinutes} min &nbsp; {mistakesLabel(totalMistakes)}
+      </p>
+    </div>
+  </section>
+
+  <section id="juontajat" class="wrap">
+    <div class="head"><span class="label no">02</span><h2>Juontajat</h2></div>
+    <ul class="hosts grid">
+      {
+        HOSTS.map((h) => (
+          <li class="host">
+            <img class="dither portrait" src={h.portrait} width="240" height="240" alt="" loading="lazy" />
+            <h3>{h.name}</h3>
+            <p class="dim">{h.role}</p>
+            <p class="links">
+              <a href={h.linkedin} rel="noopener">LinkedIn <span aria-hidden="true">↗</span></a>
+              <a href={h.company.href} rel="noopener">{h.company.name} <span aria-hidden="true">↗</span></a>
+            </p>
+          </li>
+        ))
+      }
+    </ul>
+  </section>
+
+  <section id="tietoa" class="wrap">
+    <div class="head"><span class="label no">03</span><h2>Tietoa</h2></div>
+    <div class="about grid">
+      <p class="statement">{SITE.about[0]}</p>
+      <aside class="notes" aria-labelledby="muualla">
+        <p class="label" id="muualla">Muualla</p>
+        <ul>
+          {
+            ELSEWHERE.map((n) => (
+              <li>
+                <a href={n.href} rel="noopener">{n.name} <span aria-hidden="true">↗</span></a>
+                <span class="dim">{n.note}</span>
+              </li>
+            ))
+          }
+        </ul>
+      </aside>
+    </div>
+  </section>
+
+  <section id="kuuntele" class="wrap">
+    <div class="head"><span class="label no">04</span><h2>Kuuntele</h2></div>
+    <ul class="platforms">
+      {
+        PLATFORMS.map((p) =>
+          p.href ? (
+            <li>
+              <a href={p.href} rel="noopener">
+                <span>{p.name}</span>
+                <span class="arrow" aria-hidden="true">→</span>
+              </a>
+            </li>
+          ) : (
+            <li class="soon">
+              <span>{p.name}</span>
+              <span class="label">Tulossa</span>
+            </li>
+          ),
+        )
+      }
+    </ul>
+  </section>
+
+  <Footer slot="footer" />
+</Base>
+
+<script>
+  import "../scripts/typer.ts";
+</script>
+
+<style>
+  /* --- Hero: the logo, large, as the intro ends --- */
+  .hero {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    min-height: 100svh;
+    padding-top: clamp(96px, 14vh, 160px);
+    padding-bottom: calc(var(--bar) + clamp(64px, 12vh, 140px));
+  }
+
+  .hero-top .label {
+    grid-column: span 6;
+  }
+
+  .hero-top .count {
+    text-align: right;
+  }
+
+  .logo {
+    /* The logo is the brightest thing on the tube: a wider halo, as in the intro. */
+    text-shadow:
+      -0.012em 0 0 var(--red),
+      0.012em 0 0 var(--blue),
+      0 0 0.03em rgb(255 249 240 / 0.8),
+      0 0 0.12em rgb(255 234 208 / 0.42),
+      0 0 0.45em rgb(255 226 192 / 0.2);
+    margin-block: auto;
+    padding-block: 6vh;
+    font-size: var(--t-logo);
+    line-height: 0.95;
+    letter-spacing: -0.045em;
+    margin-left: -0.04em;
+  }
+
+  .typed {
+    white-space: pre-wrap;
+  }
+
+  :global(.typer-pending) .typed {
+    visibility: hidden;
+    /* If the script never runs, show the logo anyway. */
+    animation: reveal 0s 2.5s forwards;
+  }
+
+  @keyframes reveal {
+    to {
+      visibility: visible;
+    }
+  }
+
+  /* The caret: a thin bar between glyphs, as in the intro. Solid while typing, blinking at rest. */
+  .typed :global(.caret) {
+    position: relative;
+    display: inline-block;
+    width: 0;
+    height: 0.8em;
+  }
+
+  .typed :global(.caret)::before {
+    content: "";
+    position: absolute;
+    left: -0.025em;
+    bottom: -0.16em;
+    width: 0.05em;
+    height: 0.98em;
+    background: var(--phosphor);
+    box-shadow:
+      -0.012em 0 0 var(--red),
+      0.012em 0 0 var(--blue),
+      0 0 0.15em var(--halo);
+    animation: blink 1s steps(1) infinite;
+  }
+
+  .typed:global(.is-typing) :global(.caret)::before {
+    animation: none;
+  }
+
+  /* A glyph flares as it is typed. */
+  .typed :global(.strike) {
+    animation: strike 260ms ease-out;
+  }
+
+  @keyframes strike {
+    from {
+      text-shadow:
+        -0.02em 0 0 var(--red),
+        0.02em 0 0 var(--blue),
+        0 0 0.12em #fff,
+        0 0 0.5em var(--halo);
+    }
+  }
+
+  .hero-foot {
+    align-items: end;
+    row-gap: 32px;
+  }
+
+  .lead {
+    grid-column: 1 / span 6;
+    font-size: var(--t-lead);
+    line-height: 1.35;
+    max-width: 30ch;
+  }
+
+  .latest {
+    grid-column: 8 / span 5;
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 6px 16px;
+    padding-top: 14px;
+    border-top: 1px solid var(--rule);
+    text-decoration: none;
+  }
+
+  .latest .label {
+    grid-column: 1 / -1;
+  }
+
+  .latest-title {
+    font-size: var(--t-lead);
+    line-height: 1.2;
+  }
+
+  .latest .arrow {
+    font-size: var(--t-lead);
+  }
+
+  .latest:hover .latest-title,
+  .latest:hover .arrow {
+    background: var(--phosphor);
+    color: var(--black);
+    text-shadow: none;
+  }
+
+  /* --- Episodes --- */
+  .feature {
+    row-gap: 40px;
+    align-items: end;
+  }
+
+  .feature-art {
+    grid-column: 1 / span 7;
+  }
+
+  .feature-text {
+    grid-column: 8 / span 5;
+    display: grid;
+    gap: 24px;
+  }
+
+  .feature-text h3 {
+    font-size: clamp(2.25rem, 1rem + 3.6vw, 5rem);
+    line-height: 1;
+  }
+
+  .feature-text h3 a {
+    text-decoration: none;
+  }
+
+  .feature-text h3 a:hover {
+    background: var(--phosphor);
+    color: var(--black);
+    text-shadow: none;
+  }
+
+  .more {
+    justify-self: start;
+    text-decoration: none;
+    border-bottom: 1px solid var(--rule);
+  }
+
+  .more:hover {
+    background: var(--phosphor);
+    color: var(--black);
+    text-shadow: none;
+  }
+
+  .dir {
+    margin-top: clamp(80px, 10vw, 160px);
+  }
+
+  .dir-prompt {
+    margin-bottom: 20px;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-variant-numeric: tabular-nums;
+  }
+
+  th,
+  td {
+    padding: 14px 16px 14px 0;
+    text-align: left;
+    font-weight: 400;
+    vertical-align: baseline;
+  }
+
+  th:first-child,
+  td:first-child {
+    width: 8ch;
+  }
+
+  .num {
+    text-align: right;
+    white-space: nowrap;
+  }
+
+  thead tr {
+    border-bottom: 1px solid var(--rule);
+  }
+
+  tbody tr {
+    border-bottom: 1px solid var(--rule);
+    font-size: var(--t-lead);
+  }
+
+  tbody a {
+    text-decoration: none;
+  }
+
+  tbody tr:hover {
+    background: var(--phosphor);
+    color: var(--black);
+    text-shadow: none;
+  }
+
+  .dir-total {
+    margin-top: 16px;
+    font-size: var(--t-small);
+    white-space: pre-wrap;
+  }
+
+  /* --- Hosts --- */
+  .hosts {
+    padding: 0;
+    list-style: none;
+    row-gap: 64px;
+  }
+
+  .host {
+    grid-column: span 4;
+    display: grid;
+    gap: 10px;
+    align-content: start;
+  }
+
+  .portrait {
+    margin-bottom: 14px;
+    aspect-ratio: 1;
+    /* The tube fades the picture in from above and out below, as it does the page. */
+    mask-image: linear-gradient(transparent 0, #000 16%, #000 78%, transparent 100%);
+  }
+
+  .host .links {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px 20px;
+    font-size: var(--t-small);
+  }
+
+  .host .links a,
+  .notes a {
+    text-decoration: none;
+    border-bottom: 1px solid var(--rule);
+  }
+
+  .host .links a:hover,
+  .notes a:hover {
+    background: var(--phosphor);
+    color: var(--black);
+    border-color: var(--phosphor);
+    text-shadow: none;
+  }
+
+  .host h3 {
+    font-size: var(--t-statement);
+  }
+
+  /* --- About --- */
+  .about {
+    row-gap: 48px;
+  }
+
+  .statement {
+    grid-column: 1 / span 10;
+    font-size: var(--t-statement);
+    line-height: 1.18;
+    letter-spacing: -0.03em;
+  }
+
+  /* Side notes: small, in the margin column, as in a Swiss book. */
+  .notes {
+    grid-column: 1 / span 4;
+    grid-row: 2;
+    display: grid;
+    gap: 12px;
+    align-content: start;
+    font-size: var(--t-small);
+  }
+
+  .notes ul {
+    display: grid;
+    gap: 10px;
+    padding: 0;
+    list-style: none;
+  }
+
+  .notes li {
+    display: grid;
+    gap: 2px;
+    justify-items: start;
+  }
+
+  /* --- Listen --- */
+  .platforms {
+    padding: 0;
+    list-style: none;
+    border-top: 1px solid var(--rule);
+  }
+
+  .platforms a,
+  .platforms .soon {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 24px;
+    padding: clamp(14px, 1.6vw, 24px) 0;
+    font-size: var(--t-title);
+    line-height: 1;
+    letter-spacing: -0.04em;
+    text-decoration: none;
+  }
+
+  .platforms li {
+    border-bottom: 1px solid var(--rule);
+  }
+
+  .platforms a:hover {
+    background: var(--phosphor);
+    color: var(--black);
+    text-shadow: none;
+  }
+
+  .platforms .soon {
+    color: var(--faint);
+    text-shadow: none;
+  }
+
+  .platforms .soon .label {
+    font-size: var(--t-small);
+    letter-spacing: 0.08em;
+    line-height: inherit;
+  }
+
+  /* --- Small screens --- */
+  @media (max-width: 900px) {
+    .feature-art,
+    .feature-text,
+    .lead,
+    .latest {
+      grid-column: 1 / -1;
+    }
+
+    .host {
+      grid-column: span 12;
+    }
+
+    .hosts {
+      row-gap: 72px;
+    }
+
+    .statement,
+    .notes {
+      grid-column: 1 / -1;
+      grid-row: auto;
+    }
+  }
+
+  @media (min-width: 600px) and (max-width: 900px) {
+    .host {
+      grid-column: span 6;
+    }
+  }
+
+  @media (max-width: 700px) {
+    /* Two lines on a phone, so the logo can stay large. */
+    .logo {
+      font-size: 20vw;
+    }
+
+    th:nth-child(3),
+    td:nth-child(3) {
+      display: none;
+    }
+  }
+</style>

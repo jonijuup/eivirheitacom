@@ -1,0 +1,255 @@
+---
+import type { GetStaticPaths } from "astro";
+import Footer from "../../components/Footer.astro";
+import Base from "../../layouts/Base.astro";
+import {
+  EPISODES,
+  type Episode,
+  episodeImage,
+  episodeLinks,
+  episodeOg,
+  episodeUrl,
+  formatDate,
+  isoDuration,
+  minutes,
+  pad,
+} from "../../data/episodes.ts";
+import { HOSTS, hostList, PLATFORMS, SITE } from "../../data/site.ts";
+import { episodeMd } from "../../lib/markdown.ts";
+import { timestamp, transcript } from "../../lib/transcript.ts";
+
+export const getStaticPaths = (() =>
+  EPISODES.map((e, i) => ({
+    params: { slug: e.slug },
+    props: { episode: e, newer: EPISODES[i - 1], older: EPISODES[i + 1] },
+  }))) satisfies GetStaticPaths;
+
+interface Props {
+  episode: Episode;
+  newer?: Episode;
+  older?: Episode;
+}
+
+const { episode: e, newer, older } = Astro.props;
+const lines = e.transcript ? transcript(e.transcript) : [];
+const abs = (p: string) => new URL(p, SITE.url).href;
+const links = episodeLinks(e, PLATFORMS).filter((p) => p.id !== "rss");
+
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@type": "PodcastEpisode",
+  name: e.title,
+  episodeNumber: e.number,
+  description: e.description,
+  url: abs(episodeUrl(e)),
+  image: abs(episodeOg(e)),
+  inLanguage: SITE.lang,
+  duration: isoDuration(e),
+  sameAs: Object.values(e.links ?? {}),
+  ...(e.date ? { datePublished: e.date } : {}),
+  about: e.topics,
+  actor: HOSTS.map((h) => ({ "@type": "Person", name: h.name })),
+  partOfSeries: { "@type": "PodcastSeries", name: SITE.name, url: SITE.url },
+};
+---
+
+<Base
+  title={`${pad(e.number)} ${e.title}`}
+  description={e.description}
+  path={[{ name: "JAKSOT", href: "/#jaksot" }, { name: pad(e.number) }]}
+  markdown={episodeMd(e)}
+  image={episodeOg(e)}
+  jsonLd={jsonLd}
+  keys={lines.length ? [{ key: "5", name: "Litterointi", href: "#litterointi" }] : []}
+>
+  <article>
+    <header class="ep wrap">
+      <p class="label">Jakso {pad(e.number)}</p>
+      <h1>{e.title}</h1>
+      <dl class="facts">
+        {e.date && <div><dt>Julkaistu</dt><dd>{formatDate(e.date)}</dd></div>}
+        {e.recorded && <div><dt>Nauhoitettu</dt><dd>{formatDate(e.recorded)}</dd></div>}
+        <div><dt>Kesto</dt><dd>{minutes(e)} min</dd></div>
+        <div><dt>Virheitä</dt><dd>{e.mistakes}</dd></div>
+        <div><dt>Keskustelijat</dt><dd>{hostList()}</dd></div>
+      </dl>
+    </header>
+
+    <div class="wrap">
+      <figure class="art dither-frame">
+        <img class="dither" src={episodeImage(e)} width="560" height="315" alt={`Jakson ${pad(e.number)} kansikuva: ${e.title}. ${hostList()}.`} />
+      </figure>
+    </div>
+
+    <section class="wrap" aria-labelledby="tassa-jaksossa">
+      <div class="head"><span class="label no">01</span><h2 id="tassa-jaksossa">Tässä jaksossa</h2></div>
+      <div class="body grid">
+        <p class="desc">{e.description}</p>
+        <ol class="topics">
+          {e.topics.map((t, i) => <li><span class="dim">{pad(i + 1)}</span><span>{t}</span></li>)}
+        </ol>
+        <div class="listen">
+          <p class="label">Kuuntele</p>
+          <div class="btns">
+            {
+              links.map((p) =>
+                p.href ? (
+                  <a class="btn" href={p.href} rel="noopener">{p.name}</a>
+                ) : (
+                  <span class="btn" aria-disabled="true">{p.name}: tulossa</span>
+                ),
+              )
+            }
+          </div>
+        </div>
+      </div>
+    </section>
+
+    {
+      lines.length > 0 && (
+        <section class="wrap" id="litterointi" aria-labelledby="litterointi-otsikko">
+          <div class="head">
+            <span class="label no">02</span>
+            <h2 id="litterointi-otsikko">Litterointi</h2>
+          </div>
+          <div class="grid">
+            <p class="note dim">
+              Konetekstitys, joten siinä on virheitä. Puhujia ei ole merkitty. Myös <a href={episodeMd(e)}>Markdownina</a>.
+            </p>
+            <div class="transcript quiet">
+              {lines.map((p) => (
+                <p id={`t${Math.floor(p.start)}`}>
+                  <a class="ts dim" href={`#t${Math.floor(p.start)}`}>{timestamp(p.start)}</a>
+                  <span>{p.text}</span>
+                </p>
+              ))}
+            </div>
+          </div>
+        </section>
+      )
+    }
+
+    {
+      (newer || older) && (
+        <nav class="wrap pager" aria-label="Muut jaksot">
+          {older && <a class="btn" href={episodeUrl(older)}>← {pad(older.number)} {older.title}</a>}
+          {newer && <a class="btn" href={episodeUrl(newer)}>{pad(newer.number)} {newer.title} →</a>}
+        </nav>
+      )
+    }
+  </article>
+
+  <Footer slot="footer" />
+</Base>
+
+<style>
+  .ep {
+    display: grid;
+    gap: 28px;
+    padding-top: clamp(140px, 22vh, 260px);
+    padding-bottom: clamp(56px, 8vw, 120px);
+  }
+
+  .ep h1 {
+    font-size: clamp(3rem, 1rem + 8.4vw, 11rem);
+    line-height: 0.95;
+    letter-spacing: -0.045em;
+    max-width: 12ch;
+  }
+
+  .art {
+    max-width: 1200px;
+  }
+
+  .body {
+    row-gap: 48px;
+  }
+
+  .desc {
+    grid-column: 1 / span 5;
+    font-size: var(--t-lead);
+    line-height: 1.4;
+  }
+
+  .topics {
+    grid-column: 7 / span 6;
+    padding: 0;
+    list-style: none;
+    border-top: 1px solid var(--rule);
+  }
+
+  .topics li {
+    display: grid;
+    grid-template-columns: 4ch 1fr;
+    gap: 16px;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--rule);
+  }
+
+  .listen {
+    grid-column: 7 / span 6;
+    display: grid;
+    gap: 14px;
+  }
+
+  .note {
+    grid-column: 1 / span 3;
+    font-size: var(--t-small);
+    align-self: start;
+    position: sticky;
+    top: 120px;
+  }
+
+  .transcript {
+    grid-column: 4 / span 8;
+    display: grid;
+    gap: 1.1em;
+    max-width: 72ch;
+  }
+
+  .transcript p {
+    display: grid;
+    grid-template-columns: 7ch 1fr;
+    gap: 16px;
+    scroll-margin-top: 140px;
+  }
+
+  .ts {
+    font-variant-numeric: tabular-nums;
+    text-decoration: none;
+  }
+
+  .ts:hover,
+  .transcript p:target .ts {
+    background: var(--phosphor);
+    color: var(--black);
+    text-shadow: none;
+  }
+
+  .pager {
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+    padding-top: clamp(96px, 12vw, 180px);
+  }
+
+  @media (max-width: 900px) {
+    .desc,
+    .topics,
+    .listen,
+    .note,
+    .transcript {
+      grid-column: 1 / -1;
+    }
+
+    .note {
+      position: static;
+      margin-bottom: 24px;
+    }
+
+    .transcript p {
+      grid-template-columns: 1fr;
+      gap: 2px;
+    }
+  }
+</style>

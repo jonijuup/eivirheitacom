@@ -1,0 +1,109 @@
+---
+// The dither lab: every style at every resolution, to choose the look. Not linked from the site.
+import Base from "../layouts/Base.astro";
+import lab from "../data/dither.json";
+
+const ep = lab.episodes[0];
+---
+
+<Base
+  title="Dither-laboratorio"
+  description="Kansikuvan dither-tyylit rinnakkain."
+  path={[{ name: "DITHER" }]}
+  noindex
+>
+  <header class="wrap intro">
+    <p class="label">Laboratorio</p>
+    <h1>Dither</h1>
+    <p class="dim">
+      Käytössä nyt: <strong>{lab.styles.find((s) => s.key === lab.style)?.label}</strong>. Vaihda tyyli kohdasta
+      <code>STYLE</code> tiedostossa <code>scripts/dither.mjs</code>. Leveys on dither-pikseleinä; sivu skaalaa ne ruudulle
+      kovina pikseleinä.
+    </p>
+  </header>
+
+  <section class="wrap">
+    <div class="head"><span class="label no">00</span><h2>Alkuperäinen</h2></div>
+    <img class="original" src={`/media/og/${ep}.jpg`} alt="Alkuperäinen värillinen kansikuva" width="1200" height="675" />
+  </section>
+
+  {
+    lab.styles.map((s, i) => (
+      <section class="wrap">
+        <div class="head">
+          <span class="label no">{String(i + 1).padStart(2, "0")}</span>
+          <h2>
+            {s.label}
+            {s.key === lab.style && " · käytössä"}
+          </h2>
+        </div>
+        <div class="row">
+          {lab.widths.map((w) => (
+            <figure class="dither-frame">
+              <img class="dither" src={`/media/lab/${ep}-${s.key}-${w}.png`} alt="" loading="lazy" />
+              <figcaption class="label">{w} px</figcaption>
+            </figure>
+          ))}
+        </div>
+        <p class="dl">
+          <a class="btn" href={`/media/lab/${ep}-${s.key}-artwork.png`} download>
+            Lataa kansikuvaksi (1680 × 945)
+          </a>
+        </p>
+      </section>
+    ))
+  }
+</Base>
+
+<style>
+  .intro {
+    display: grid;
+    gap: 24px;
+    padding-top: clamp(140px, 22vh, 260px);
+  }
+
+  .intro h1 {
+    font-size: var(--t-logo);
+    line-height: 0.95;
+  }
+
+  .intro p.dim {
+    max-width: 60ch;
+  }
+
+  code {
+    font-family: inherit;
+    color: var(--phosphor);
+  }
+
+  .original {
+    width: 100%;
+    max-width: 900px;
+    height: auto;
+  }
+
+  .row {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: var(--gap);
+  }
+
+  figure {
+    display: grid;
+    gap: 10px;
+  }
+
+  .dl {
+    margin-top: 24px;
+  }
+
+  section:last-of-type {
+    padding-bottom: 30vh;
+  }
+
+  @media (max-width: 900px) {
+    .row {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

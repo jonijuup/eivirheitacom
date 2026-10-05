@@ -1,0 +1,114 @@
+---
+import "@fontsource/ibm-plex-mono/400.css";
+import "../styles/global.css";
+import { SITE } from "../data/site.ts";
+
+export type Key = { key: string; name: string; href: string };
+
+interface Props {
+  title: string;
+  description: string;
+  /** The prompt line's path after C:\EIVIRHEITA, e.g. [{ name: "JAKSOT", href: "/#jaksot" }, { name: "01" }]. */
+  path?: { name: string; href?: string }[];
+  /** This page as Markdown, for agents. */
+  markdown?: string;
+  image?: string;
+  jsonLd?: object;
+  keys?: Key[];
+  noindex?: boolean;
+}
+
+const { title, description, path = [], markdown, image = "/media/og/01.jpg", jsonLd, keys = [], noindex } = Astro.props;
+const canonical = new URL(Astro.url.pathname, SITE.url).href;
+const pageTitle = title === SITE.name ? `${SITE.name}: ${SITE.tagline}` : `${title} | ${SITE.name}`;
+
+const KEYS: Key[] = [
+  { key: "1", name: "Etusivu", href: "/" },
+  { key: "2", name: "Jaksot", href: "/#jaksot" },
+  { key: "3", name: "Juontajat", href: "/#juontajat" },
+  { key: "4", name: "Kuuntele", href: "/#kuuntele" },
+  ...keys,
+];
+---
+
+<!doctype html>
+<html lang={SITE.lang}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{pageTitle}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+    {noindex && <meta name="robots" content="noindex" />}
+    <meta name="theme-color" content="#040404" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    {markdown && <link rel="alternate" type="text/markdown" href={markdown} title="Markdown" />}
+    <link rel="alternate" type="text/plain" href="/llms.txt" title="llms.txt" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content={SITE.name} />
+    <meta property="og:locale" content="fi_FI" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={new URL(image, SITE.url).href} />
+    <meta name="twitter:card" content="summary_large_image" />
+    {jsonLd && <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />}
+  </head>
+  <body>
+    <a class="sr-only" href="#main">Siirry sisältöön</a>
+
+    <header class="top">
+      <div class="wrap">
+        <nav class="prompt" aria-label="Sijainti">
+          <a href="/">C:\EIVIRHEITA</a>
+          {
+            path.map((p) => (
+              <>
+                <span class="sep">\</span>
+                {p.href ? <a href={p.href}>{p.name}</a> : <span aria-current="page">{p.name}</span>}
+              </>
+            ))
+          }
+          <span aria-hidden="true">&gt;</span><span class="cursor" aria-hidden="true"></span>
+        </nav>
+        <p class="tagline">{SITE.tagline}</p>
+      </div>
+    </header>
+
+    <main id="main">
+      <slot />
+    </main>
+
+    <slot name="footer" />
+
+    <nav class="keys" aria-label="Pikanäppäimet">
+      <div class="wrap">
+        <ol>
+          {
+            KEYS.map((k) => (
+              <li>
+                <a href={k.href} data-key={k.key}>
+                  <kbd>{k.key}</kbd>
+                  <span class="name">{k.name}</span>
+                </a>
+              </li>
+            ))
+          }
+        </ol>
+      </div>
+    </nav>
+
+    <div class="fade fade-top" aria-hidden="true"></div>
+    <div class="fade fade-bottom" aria-hidden="true"></div>
+    <div class="crt" aria-hidden="true">
+      <div class="crt-lines"></div>
+      <div class="crt-dots"></div>
+      <div class="crt-roll"></div>
+      <div class="crt-glass"></div>
+    </div>
+
+    <script>
+      import "../scripts/keys.ts";
+    </script>
+  </body>
+</html>
