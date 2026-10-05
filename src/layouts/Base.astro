@@ -4,6 +4,15 @@ import "../styles/global.css";
 import { SITE } from "../data/site.ts";
 
 export type Key = { key: string; name: string; href: string };
+export type ShareImage = { src: string; width: number; height: number; alt: string };
+
+/** The show's share card, made by `pnpm og` from /og/. */
+const CARD: ShareImage = {
+  src: "/og.png",
+  width: 1200,
+  height: 630,
+  alt: "Ei virheitä. Podcast tekoälystä ja teknologiasta. eivirheita.com",
+};
 
 interface Props {
   title: string;
@@ -12,13 +21,14 @@ interface Props {
   path?: { name: string; href?: string }[];
   /** This page as Markdown, for agents. */
   markdown?: string;
-  image?: string;
+  /** What a shared link shows; the show's card unless a page has its own. */
+  image?: ShareImage;
   jsonLd?: object;
   keys?: Key[];
   noindex?: boolean;
 }
 
-const { title, description, path = [], markdown, image = "/media/og/01.jpg", jsonLd, keys = [], noindex } = Astro.props;
+const { title, description, path = [], markdown, image = CARD, jsonLd, keys = [], noindex } = Astro.props;
 const canonical = new URL(Astro.url.pathname, SITE.url).href;
 const pageTitle = title === SITE.name ? `${SITE.name}: ${SITE.tagline}` : `${title} | ${SITE.name}`;
 
@@ -50,8 +60,15 @@ const KEYS: Key[] = [
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
     <meta property="og:url" content={canonical} />
-    <meta property="og:image" content={new URL(image, SITE.url).href} />
+    <meta property="og:image" content={new URL(image.src, SITE.url).href} />
+    <meta property="og:image:width" content={String(image.width)} />
+    <meta property="og:image:height" content={String(image.height)} />
+    <meta property="og:image:alt" content={image.alt} />
     <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={new URL(image.src, SITE.url).href} />
+    <meta name="twitter:image:alt" content={image.alt} />
     {jsonLd && <script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />}
   </head>
   <body>

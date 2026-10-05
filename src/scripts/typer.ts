@@ -31,7 +31,8 @@ function render(el: HTMLElement, chars: string[], caret: number, fresh: number |
   const glyph = (c: string, i: number) => {
     const span = document.createElement("span");
     span.textContent = c;
-    if (i === fresh) span.className = "strike";
+    // The space is where a phone breaks the logo onto two lines (see .sp in index.astro).
+    span.className = [c === " " ? "sp" : "", i === fresh ? "strike" : ""].join(" ").trim();
     return span;
   };
   const cursor = document.createElement("span");

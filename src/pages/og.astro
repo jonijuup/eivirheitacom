@@ -1,0 +1,117 @@
+---
+// The share card (1200 × 630), drawn on the tube like the site. `pnpm og` screenshots it to public/og.png.
+import "@fontsource/ibm-plex-mono/400.css";
+import "../styles/global.css";
+import { hostList, SITE } from "../data/site.ts";
+---
+
+<!doctype html>
+<html lang={SITE.lang}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="robots" content="noindex" />
+    <title>Jakokuva | {SITE.name}</title>
+  </head>
+  <body>
+    <div class="card">
+      <p class="prompt">C:\EIVIRHEITA&gt;<span class="cursor"></span></p>
+      <p class="logo">Ei virheitä<span class="caret"></span></p>
+      <div class="base">
+        <div>
+          <p class="tagline">{SITE.tagline}</p>
+          <p class="hosts">{hostList()}</p>
+        </div>
+        <p class="url">eivirheita.com</p>
+      </div>
+    </div>
+    <div class="crt" aria-hidden="true">
+      <div class="crt-lines"></div>
+      <div class="crt-dots"></div>
+      <div class="crt-glass"></div>
+    </div>
+  </body>
+</html>
+
+<style>
+  :global(body) {
+    width: 1200px;
+    height: 630px;
+    min-height: 0;
+    overflow: hidden;
+    background: radial-gradient(120% 100% at 50% 45%, #171817 0%, var(--glass) 52%, #070707 85%, var(--black) 100%);
+  }
+
+  .card {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    height: 630px;
+    padding: 56px 68px 60px;
+  }
+
+  .prompt {
+    font-size: 20px;
+    color: var(--dim);
+  }
+
+  /* As large as the line allows, with the intro's halo. */
+  .logo {
+    font-size: 166px;
+    line-height: 1;
+    letter-spacing: -0.045em;
+    margin-left: -0.04em;
+    text-shadow:
+      -2px 0 0 var(--red),
+      2px 0 0 var(--blue),
+      0 0 5px rgb(255 249 240 / 0.8),
+      0 0 20px rgb(255 234 208 / 0.45),
+      0 0 72px rgb(255 226 192 / 0.22);
+  }
+
+  .caret {
+    position: relative;
+    display: inline-block;
+    width: 0;
+    height: 0.8em;
+  }
+
+  .caret::before {
+    content: "";
+    position: absolute;
+    left: -0.02em;
+    bottom: -0.16em;
+    width: 0.05em;
+    height: 0.98em;
+    background: var(--phosphor);
+    box-shadow:
+      -2px 0 0 var(--red),
+      2px 0 0 var(--blue),
+      0 0 24px var(--halo);
+  }
+
+  .base {
+    display: flex;
+    justify-content: space-between;
+    align-items: end;
+    gap: 32px;
+    padding-top: 18px;
+    border-top: 1px solid var(--rule);
+  }
+
+  .tagline,
+  .url {
+    font-size: 30px;
+    line-height: 1.25;
+  }
+
+  .hosts {
+    margin-top: 6px;
+    font-size: 20px;
+    color: var(--dim);
+  }
+
+  /* A still: the cursor lit, no roll bar. */
+  .cursor {
+    animation: none;
+  }
+</style>

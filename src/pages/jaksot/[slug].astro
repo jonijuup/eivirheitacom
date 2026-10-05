@@ -58,7 +58,7 @@ const jsonLd = {
   description={e.description}
   path={[{ name: "JAKSOT", href: "/#jaksot" }, { name: pad(e.number) }]}
   markdown={episodeMd(e)}
-  image={episodeOg(e)}
+  image={{ src: episodeOg(e), width: 1200, height: 675, alt: `Jakson ${pad(e.number)} kansikuva: ${e.title}` }}
   jsonLd={jsonLd}
   keys={lines.length ? [{ key: "5", name: "Litterointi", href: "#litterointi" }] : []}
 >

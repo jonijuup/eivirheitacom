@@ -5,7 +5,6 @@ import {
   EPISODES,
   episodeImage,
   episodeLinks,
-  episodeOg,
   episodeUrl,
   formatDate,
   isoDuration,
@@ -29,7 +28,7 @@ const jsonLd = {
   description: SITE.description,
   url: SITE.url,
   inLanguage: SITE.lang,
-  image: abs(episodeOg(latest)),
+  image: abs("/og.png"),
   ...(rss ? { webFeed: rss } : {}),
   sameAs: PLATFORMS.filter((p) => p.id !== "rss" && p.href).map((p) => p.href),
   author: HOSTS.map((h) => ({
@@ -51,7 +50,7 @@ const jsonLd = {
 };
 ---
 
-<Base title={SITE.name} description={SITE.description} markdown="/index.md" image={episodeOg(latest)} jsonLd={jsonLd}>
+<Base title={SITE.name} description={SITE.description} markdown="/index.md" jsonLd={jsonLd}>
   <section class="hero wrap" id="top">
     <div class="hero-top grid">
       <p class="label">Podcast</p>
@@ -62,7 +61,7 @@ const jsonLd = {
       if (!matchMedia("(prefers-reduced-motion: reduce)").matches) document.documentElement.classList.add("typer-pending");
     </script>
     <h1 class="logo" aria-label="Ei virheitä">
-      <span class="typed" data-typer aria-hidden="true">Ei virheitä<span class="caret"></span></span>
+      <span class="typed" data-typer aria-hidden="true">Ei<span class="sp"> </span>virheitä<span class="caret"></span></span>
     </h1>
 
     <div class="hero-foot grid">
@@ -233,6 +232,12 @@ const jsonLd = {
     line-height: 0.95;
     letter-spacing: -0.045em;
     margin-left: -0.04em;
+  }
+
+  /* The logo keeps its full height from the first frame, so nothing moves while it is typed. */
+  .logo {
+    --lines: 1;
+    min-height: calc(var(--lines) * 0.95em + 12vh);
   }
 
   .typed {
@@ -590,7 +595,15 @@ const jsonLd = {
   @media (max-width: 700px) {
     /* Two lines on a phone, so the logo can stay large. */
     .logo {
+      --lines: 2;
       font-size: 20vw;
+    }
+
+    /* Always break at the space, rather than when the word happens to overflow. */
+    .typed :global(.sp) {
+      display: block;
+      height: 0;
+      overflow: hidden;
     }
 
     th:nth-child(3),
