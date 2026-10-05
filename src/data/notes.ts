@@ -85,19 +85,10 @@ export const NOTES: Record<number, EpisodeNotes> = {
         body: [
           "Luvut luettiin ruudulta kielimallin vastauksesta, ei mitatusta lähteestä. Yleispätevää lukua ei ole: se riippuu tokenizerista, aineistosta ja siitä, mitä merkiksi lasketaan.",
           `Mittasimme tämän jakson litteroinnin: suomi on o200k_basella 3,5 merkkiä per token ja cl100k_basella 2,6 ([tiktoken](${L.tiktoken})). Suomen luku osui siis lähelle, mutta lähdettä sille ei ollut. Ilmiö on todellinen: suomi kuluttaa samaan sisältöön enemmän tokeneita, ja se näkyy hinnassa, viiveessä ja siinä, kuinka paljon kontekstiin mahtuu.`,
-          "Minuuttia aiemmin jaksossa sanotaan ”joo joo, kyllä sokeesti voi luottaa, se on tekoäly” ja pyydetään bullshit-leimaa. Sitten luetaan mallin luvut ääneen faktana. Tässä ohjelma on parhaimmillaan.",
         ],
       },
     ],
-    clarifications: [
-      {
-        time: 1204,
-        claim: "Tokenizerin sanasto on kasvanut GPT-3:n 50 000:sta GPT-4o:n 200 000:een.",
-        body: [
-          `Pitää paikkansa. Sukupolvittain noin 50 000 (GPT-3, r50k_base), 100 000 (GPT-4, cl100k_base) ja 200 000 (GPT-4o, o200k_base) ([tiktoken](${L.tiktoken})). Valtteri nimeää GPT-4o:n samassa lauseessa, joten ensi kuulemalta virheeltä kuulostava kohta ei ole virhe.`,
-        ],
-      },
-    ],
+    clarifications: [],
     glossary: [
       {
         term: "Harness",
