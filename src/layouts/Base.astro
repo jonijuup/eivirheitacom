@@ -37,8 +37,10 @@ const KEYS: Key[] = [
   { key: "2", name: "Jaksot", href: "/#jaksot" },
   { key: "3", name: "Juontajat", href: "/#juontajat" },
   { key: "4", name: "Kuuntele", href: "/#kuuntele" },
-  ...keys,
-];
+]
+  // A page can point a key somewhere of its own, or add keys.
+  .map((k) => keys.find((p) => p.key === k.key) ?? k)
+  .concat(keys.filter((p) => !["1", "2", "3", "4"].includes(p.key)));
 ---
 
 <!doctype html>

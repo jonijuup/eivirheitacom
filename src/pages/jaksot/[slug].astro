@@ -60,7 +60,10 @@ const jsonLd = {
   markdown={episodeMd(e)}
   image={{ src: episodeOg(e), width: 1200, height: 675, alt: `Jakson ${pad(e.number)} kansikuva: ${e.title}` }}
   jsonLd={jsonLd}
-  keys={lines.length ? [{ key: "5", name: "Litterointi", href: "#litterointi" }] : []}
+  keys={[
+    { key: "4", name: "Kuuntele", href: "#kuuntele" },
+    ...(lines.length ? [{ key: "5", name: "Litterointi", href: "#litterointi" }] : []),
+  ]}
 >
   <article>
     <header class="ep wrap">
@@ -73,6 +76,20 @@ const jsonLd = {
         <div><dt>Virheitä</dt><dd>{e.mistakes}</dd></div>
         <div><dt>Keskustelijat</dt><dd>{hostList()}</dd></div>
       </dl>
+      <div class="listen" id="kuuntele">
+        <p class="label">Kuuntele</p>
+        <div class="btns">
+          {
+            links.map((p) =>
+              p.href ? (
+                <a class="btn" href={p.href} rel="noopener">{p.name}</a>
+              ) : (
+                <span class="btn" aria-disabled="true">{p.name}: tulossa</span>
+              ),
+            )
+          }
+        </div>
+      </div>
     </header>
 
     <div class="wrap">
@@ -88,20 +105,6 @@ const jsonLd = {
         <ol class="topics">
           {e.topics.map((t, i) => <li><span class="dim">{pad(i + 1)}</span><span>{t}</span></li>)}
         </ol>
-        <div class="listen">
-          <p class="label">Kuuntele</p>
-          <div class="btns">
-            {
-              links.map((p) =>
-                p.href ? (
-                  <a class="btn" href={p.href} rel="noopener">{p.name}</a>
-                ) : (
-                  <span class="btn" aria-disabled="true">{p.name}: tulossa</span>
-                ),
-              )
-            }
-          </div>
-        </div>
       </div>
     </section>
 
@@ -145,8 +148,8 @@ const jsonLd = {
 <style>
   .ep {
     display: grid;
-    gap: 28px;
-    padding-top: clamp(140px, 22vh, 260px);
+    gap: 24px;
+    padding-top: clamp(104px, 15vh, 220px);
     padding-bottom: clamp(56px, 8vw, 120px);
   }
 
@@ -186,10 +189,11 @@ const jsonLd = {
     border-bottom: 1px solid var(--rule);
   }
 
+  /* Right under the title, so the links are on the first screen, phone included. */
   .listen {
-    grid-column: 7 / span 6;
     display: grid;
     gap: 14px;
+    padding-top: 8px;
   }
 
   .note {
@@ -233,10 +237,20 @@ const jsonLd = {
     padding-top: clamp(96px, 12vw, 180px);
   }
 
+  /* On a phone the facts take three rows: the links come first, so they are on the first screen. */
+  @media (max-width: 700px) {
+    .ep .listen {
+      order: 1;
+    }
+
+    .ep .facts {
+      order: 2;
+    }
+  }
+
   @media (max-width: 900px) {
     .desc,
     .topics,
-    .listen,
     .note,
     .transcript {
       grid-column: 1 / -1;
