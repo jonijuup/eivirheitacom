@@ -8,7 +8,8 @@
     "build": "node scripts/dither.mjs && astro build",
     "preview": "astro preview",
     "check": "astro check",
-    "og": "node scripts/og.mjs"
+    "og": "node scripts/og.mjs",
+    "launch": "intentface-launch"
   },
   "dependencies": {
     "@fontsource/ibm-plex-mono": "^5.3.0",
@@ -17,8 +18,13 @@
   },
   "devDependencies": {
     "@astrojs/check": "^0.9.10",
+    "@intentface-launch/core": "link:/Users/jonijuup/Work/intentface-launch/packages/core",
     "@types/node": "^22.20.5",
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
     "playwright": "1.63.0",
+    "react": "^19.3.0",
+    "react-dom": "^19.3.0",
     "typescript": "^6.0.3"
   },
   "packageManager": "pnpm@10.33.2",
