@@ -33,7 +33,8 @@
   --t-lead: clamp(1.25rem, 1rem + 1vw, 1.75rem);
   --t-statement: clamp(1.75rem, 1.1rem + 2.6vw, 3.5rem);
   --t-title: clamp(2.5rem, 1.2rem + 5.4vw, 7rem);
-  --t-logo: clamp(4rem, 13.6vw, 17rem);
+  /* Capped so "Ei virheitä" and its caret stay on one line in the widest column (--max). */
+  --t-logo: clamp(4rem, 13.2vw, 14rem);
 
   --bar: 44px;
 }

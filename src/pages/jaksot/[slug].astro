@@ -157,7 +157,7 @@ const jsonLd = {
               {
                 [
                   { label: null, items: notes.corrections.map((c, i) => ({ ...c, n: pad(i + 1) })) },
-                  { label: "Ei virhe, vaikka kuulostaa siltä", items: notes.clarifications.map((c) => ({ ...c, n: "+" })) },
+                  { label: "Selvennyksiä", items: notes.clarifications.map((c) => ({ ...c, n: "+" })) },
                 ]
                   .filter((g) => g.items.length > 0)
                   .map((g) => (

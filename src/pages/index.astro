@@ -17,6 +17,8 @@ import {
 import { ELSEWHERE, HOSTS, hostList, PLATFORMS, SITE } from "../data/site.ts";
 
 const latest = EPISODES[0];
+/** The newest episodes listed in the hero; the rest are in the episode list below. */
+const HERO_EPISODES = 3;
 const totalMinutes = Math.round(EPISODES.reduce((sum, e) => sum + e.seconds, 0) / 60);
 const latestLinks = episodeLinks(latest, PLATFORMS).filter((p) => p.id !== "rss" && p.href);
 const totalMistakes = EPISODES.reduce((sum, e) => sum + mistakesFound(e), 0);
@@ -68,11 +70,21 @@ const jsonLd = {
 
     <div class="hero-foot grid">
       <p class="lead">{hostList()} puhuvat tekoälystä ja teknologiasta.</p>
-      <a class="latest" href={episodeUrl(latest)}>
-        <span class="label">Uusin jakso</span>
-        <span class="latest-title"><span class="dim">{pad(latest.number)}</span> {latest.title}</span>
-        <span class="arrow" aria-hidden="true">→</span>
-      </a>
+      <nav class="latest" aria-labelledby="uusimmat">
+        <p class="label" id="uusimmat">Jaksot</p>
+        <ol>
+          {
+            EPISODES.slice(0, HERO_EPISODES).map((e) => (
+              <li>
+                <a href={episodeUrl(e)}>
+                  <span class="latest-title"><span class="dim">{pad(e.number)}</span> {e.title}</span>
+                  <span class="arrow" aria-hidden="true">→</span>
+                </a>
+              </li>
+            ))
+          }
+        </ol>
+      </nav>
     </div>
   </section>
 
@@ -314,16 +326,27 @@ const jsonLd = {
 
   .latest {
     grid-column: 8 / span 5;
-    display: grid;
-    grid-template-columns: 1fr auto;
-    gap: 6px 16px;
     padding-top: 14px;
     border-top: 1px solid var(--rule);
-    text-decoration: none;
   }
 
-  .latest .label {
-    grid-column: 1 / -1;
+  .latest ol {
+    padding: 0;
+    margin: 6px 0 0;
+    list-style: none;
+  }
+
+  .latest li + li {
+    margin-top: 10px;
+    padding-top: 10px;
+    border-top: 1px solid var(--rule);
+  }
+
+  .latest a {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 16px;
+    text-decoration: none;
   }
 
   .latest-title {
@@ -335,8 +358,14 @@ const jsonLd = {
     font-size: var(--t-lead);
   }
 
-  .latest:hover .latest-title,
-  .latest:hover .arrow {
+  /* The number stays readable on the lit row, dimmed by opacity instead of colour. */
+  .latest a:hover .dim {
+    color: inherit;
+    opacity: 0.55;
+  }
+
+  .latest a:hover .latest-title,
+  .latest a:hover .arrow {
     background: var(--phosphor);
     color: var(--black);
     text-shadow: none;

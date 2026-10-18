@@ -82,7 +82,7 @@ function notesMd(e: Episode) {
 Sisältää spoilereita.
 
 ${n.corrections.map((c, i) => item(`Virhe ${i + 1}`, c)).join("\n\n")}
-${n.clarifications.map((c) => `\n${item("Ei virhe", c)}`).join("\n")}
+${n.clarifications.map((c) => `\n${item("Selvennys", c)}`).join("\n")}
 
 ## Sanasto
 

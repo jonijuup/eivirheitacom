@@ -50,6 +50,7 @@ const L = {
   lumiere: "https://arxiv.org/abs/1301.7385",
   drucker: "https://en.wikipedia.org/wiki/The_Landmarks_of_Tomorrow",
   accounting: "https://en.wikipedia.org/wiki/History_of_accounting",
+  sapiens: "https://en.wikipedia.org/wiki/Homo_sapiens",
   beta: "https://en.wikipedia.org/wiki/Beta_distribution",
 };
 
@@ -217,7 +218,7 @@ export const NOTES: Record<number, EpisodeNotes> = {
         claim: "Applen mallit ovat Google-pohjaisia, ja isot mallit pyörivät pilvessä.",
         body: [
           `Kuvaus on oikea. Siri AI ajaa Applen Foundation Model -malleja, jotka Apple rakensi yhteistyössä Googlen kanssa Geminin teknologialla. Pyynnöt käsitellään laitteella tai Applen Private Cloud Computessa, ja Apple on laajentamassa Apple Intelligencen ajoa myös Google Cloudiin ([MacRumors](${L.ios27})).`,
-          "Jaksossa palvelu mainitaan nimellä ”Pilvi Private Cloud”. Oikea nimi on Private Cloud Compute.",
+          "Jaksossa palvelu mainitaan nimellä ”Private Cloud”. Oikea nimi on Private Cloud Compute.",
         ],
       },
       {
@@ -232,8 +233,8 @@ export const NOTES: Record<number, EpisodeNotes> = {
         time: 1095,
         claim: "Tietotyö on ihmiskunnan historiassa uusi ilmiö.",
         body: [
-          `Jaksossa päädytään itse oikeaan muotoiluun: tietotyötä on tehty aina, mutta tietokoneella tehtävä tietotyö on uutta. Käsite knowledge worker on peräisin Peter Druckerin kirjasta The Landmarks of Tomorrow vuodelta 1959 ([Wikipedia](${L.drucker})).`,
-          `Mesopotamiasta on löydetty yli 7 000 vuotta vanhoja kirjanpitomerkintöjä ([Wikipedia](${L.accounting})), joten jakson savitauluvitsi osuu lähemmäs kuin miltä kuulostaa.`,
+          `Pitää paikkansa, kun mittakaavana on koko ihmiskunnan historia. Nykyihminen on ollut olemassa noin 300 000 vuotta ([Wikipedia](${L.sapiens})). Vanhimmat kirjanpitomerkinnät Mesopotamiasta ovat yli 7 000 vuotta vanhoja ([Wikipedia](${L.accounting})), ja käsite knowledge worker on peräisin Peter Druckerin kirjasta The Landmarks of Tomorrow vuodelta 1959 ([Wikipedia](${L.drucker})).`,
+          "Jos nykyihmisen historia olisi yksi vuorokausi, kirjanpito olisi alkanut noin puoli tuntia sitten ja tietokoneen ääressä tehtävä tietotyö, johon jakso itse tarkentaa, vasta viimeisten 20 sekunnin aikana.",
         ],
       },
     ],
@@ -277,7 +278,7 @@ export const NOTES: Record<number, EpisodeNotes> = {
       `Taksien vihreät rekisterikilvet: [LVM](${L.lvm}), 10.9.2026, ja [Yle](${L.yleTaxi})`,
       `Maes, [”Agents that reduce work and information overload”](${L.maes}), Communications of the ACM 37(7), 1994`,
       `Horvitz ym., [”The Lumière Project: Bayesian User Modeling for Inferring the Goals and Needs of Software Users”](${L.lumiere}), UAI 1998`,
-      `[The Landmarks of Tomorrow](${L.drucker}) ja [History of accounting](${L.accounting}), Wikipedia`,
+      `[Homo sapiens](${L.sapiens}), [History of accounting](${L.accounting}) ja [The Landmarks of Tomorrow](${L.drucker}), Wikipedia`,
     ],
   },
 };
