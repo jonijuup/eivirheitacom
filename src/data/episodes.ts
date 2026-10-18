@@ -18,6 +18,8 @@ export type Episode = {
   mistakes: number;
   description: string;
   topics: string[];
+  /** Chapters, as in the YouTube description: seconds into the episode and a title. Shown instead of the topics. */
+  chapters?: { time: number; title: string }[];
   /** Subtitles in content/transcripts/, used as the transcript. */
   transcript?: string;
   /** Per-episode links; a platform left out falls back to the show's link. */
@@ -25,6 +27,55 @@ export type Episode = {
 };
 
 export const EPISODES: Episode[] = [
+  {
+    number: 2,
+    slug: "02-agi-tuli-arki-ei-muuttunut",
+    title: "AGI tuli, arki ei muuttunut",
+    date: "2026-10-18",
+    recorded: "2026-09-13",
+    seconds: 1394,
+    mistakes: 4,
+    description:
+      "Entä jos äly olisi nopeaa, halpaa ja lokaalia? Mikä arjessa oikeasti muuttuisi, ja mikä ei muuttuisi yhtään? Kysymys on vanha, ja siihen on luvattu vastaus ennenkin.",
+    topics: [
+      "Kaksi skenaariota siitä, mihin geneerinen äly vie, ja miksi some on varoittava esimerkki",
+      "Ambientit agentit, ja käyttäjän toimien ennakointi tutkimusaiheena jo 90-luvulla",
+      "Siri, se suuri pettymys, ja livedemo, jossa Siri ei löydä yhtään paikkaa",
+      "Apple, personal context ja käyttöjärjestelmien etulyöntiasema",
+      "Sääntelyn ensirefleksi: punaisella lipulla auton edessä",
+      "Itseajavat autot ja kaupunkien uusjako",
+    ],
+    chapters: [
+      { time: 0, title: "Alkuun" },
+      { time: 60, title: "Intro" },
+      { time: 120, title: "Entä jos äly olisi nopeaa, halpaa ja lokaalia?" },
+      { time: 162, title: "Kaksi skenaariota: tehokkuus vai syvenevät railot" },
+      { time: 273, title: "Somekin alkoi hyvin" },
+      { time: 382, title: "Kotiassistentit, jotka eivät koskaan toimineet" },
+      { time: 459, title: "AGI vai ASI? Reaktiivisesta ennakoivaan" },
+      { time: 536, title: "Ennakoivat agentit ja kandi 90-luvulta" },
+      { time: 582, title: "Ambientit agentit" },
+      { time: 656, title: "Siri, se suuri pettymys" },
+      { time: 744, title: "Livedemo: Siri ei löydä yhtään paikkaa" },
+      { time: 766, title: "GPT Live ja pieruapit" },
+      { time: 820, title: "Apple, personal context ja käyttöjärjestelmät" },
+      { time: 932, title: "Milloin EU:hun? Sääntelyn ensirefleksi" },
+      { time: 970, title: "Punaisella lipulla auton edessä" },
+      { time: 998, title: "Vihreät taksikilvet" },
+      { time: 1017, title: "Henkilökohtainen konteksti ja arjen kitka" },
+      { time: 1090, title: "Tietotyö on historiallisesti uusi ilmiö" },
+      { time: 1162, title: "Onko AGI yksi systeemi vai joukko?" },
+      { time: 1226, title: "Itseajavat autot ja kaupunkien uusjako" },
+      { time: 1298, title: "Yhteiskunnan tasolla: ruoka, varastot ja optimismi" },
+      { time: 1355, title: "Outro" },
+    ],
+    transcript: "02.srt",
+    links: {
+      spotify: "https://open.spotify.com/episode/1QT8UlOODEW5vOW3O8pDYA",
+      apple: "https://podcasts.apple.com/us/podcast/jakso-2-agi-tuli-arki-ei-muuttunut/id6819228625?i=1000796918007",
+      youtube: "https://www.youtube.com/watch?v=MxxKt6qDOvc",
+    },
+  },
   {
     number: 1,
     slug: "01-agi-tuli-suomen-kieli-meni",

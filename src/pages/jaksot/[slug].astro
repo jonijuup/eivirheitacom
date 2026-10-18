@@ -119,9 +119,28 @@ const jsonLd = {
       <div class="head"><span class="label no">{no("tassa")}</span><h2 id="tassa-jaksossa">Tässä jaksossa</h2></div>
       <div class="body grid">
         <p class="desc">{e.description}</p>
-        <ol class="topics">
-          {e.topics.map((t, i) => <li><span class="dim">{pad(i + 1)}</span><span>{t}</span></li>)}
-        </ol>
+        {
+          e.chapters ? (
+            <ol class="topics chapters">
+              {e.chapters.map((c) => (
+                <li>
+                  {youtubeAt(c.time) ? (
+                    <a class="ct" href={youtubeAt(c.time)} rel="noopener" aria-label={`Katso YouTubessa kohdasta ${timestamp(c.time)}`}>
+                      {timestamp(c.time)}
+                    </a>
+                  ) : (
+                    <span class="ct dim">{timestamp(c.time)}</span>
+                  )}
+                  <span>{c.title}</span>
+                </li>
+              ))}
+            </ol>
+          ) : (
+            <ol class="topics">
+              {e.topics.map((t, i) => <li><span class="dim">{pad(i + 1)}</span><span>{t}</span></li>)}
+            </ol>
+          )
+        }
       </div>
     </section>
 
@@ -306,6 +325,23 @@ const jsonLd = {
     gap: 16px;
     padding: 12px 0;
     border-bottom: 1px solid var(--rule);
+  }
+
+  /* Chapters: the time opens YouTube there. */
+  .chapters li {
+    grid-template-columns: 5ch 1fr;
+  }
+
+  .ct {
+    font-variant-numeric: tabular-nums;
+    color: var(--dim);
+    text-decoration: none;
+  }
+
+  a.ct:hover {
+    background: var(--phosphor);
+    color: var(--black);
+    text-shadow: none;
   }
 
   /* Right under the title, so the links are on the first screen, phone included. */

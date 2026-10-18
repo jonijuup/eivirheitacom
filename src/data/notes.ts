@@ -31,6 +31,26 @@ const L = {
   opendesign: "https://open-design.ai/",
   openweights: "https://en.wikipedia.org/wiki/Open_weights",
   collapse: "https://fi.wikipedia.org/wiki/Malliromahdus",
+  // Episode 2
+  googleEnergy: "https://cloud.google.com/blog/products/infrastructure/measuring-the-environmental-impact-of-ai-inference",
+  epoch: "https://epoch.ai/gradient-updates/how-much-energy-does-chatgpt-use",
+  gptLive: "https://openai.com/fi-FI/index/introducing-gpt-live-1-in-the-api/",
+  siriDma: "https://www.apple.com/newsroom/2026/06/due-to-dma-siri-ai-delayed-in-eu-for-ios-27-and-ipados-27/",
+  ios27: "https://www.macrumors.com/roundup/ios-27/",
+  appIntents: "https://developer.apple.com/documentation/appintents",
+  pcc: "https://security.apple.com/blog/private-cloud-compute/",
+  aiAct: "https://artificialintelligenceact.eu/implementation-timeline/",
+  dma: "https://digital-markets-act.ec.europa.eu/index_en",
+  redFlagAct: "https://www.legislation.gov.uk/ukpga/Vict/28-29/83/contents/enacted",
+  redFlag: "https://en.wikipedia.org/wiki/Red_flag_traffic_laws",
+  locomotiveActs: "https://en.wikipedia.org/wiki/Locomotive_Acts",
+  lvm: "https://lvm.fi/-/valtioneuvosto-antoi-asetusmuutoksen-ajoneuvoasetukseen-takseihin-vihreat-rekisterikilvet",
+  yleTaxi: "https://yle.fi/a/74-20245666",
+  maes: "https://doi.org/10.1145/176789.176792",
+  lumiere: "https://arxiv.org/abs/1301.7385",
+  drucker: "https://en.wikipedia.org/wiki/The_Landmarks_of_Tomorrow",
+  accounting: "https://en.wikipedia.org/wiki/History_of_accounting",
+  beta: "https://en.wikipedia.org/wiki/Beta_distribution",
 };
 
 export const NOTES: Record<number, EpisodeNotes> = {
@@ -137,6 +157,127 @@ export const NOTES: Record<number, EpisodeNotes> = {
       `Shumailov ym., [”AI models collapse when trained on recursively generated data”](${L.nature}), Nature 2024`,
       `[OpenAI Tokenizer](${L.tokenizer}) (jäätelö / ice cream -testi)`,
       `[tiktoken](${L.tiktoken}): r50k_base, cl100k_base, o200k_base`,
+    ],
+  },
+  2: {
+    corrections: [
+      {
+        time: 135,
+        claim: "Jokainen tekoälykysely kaataa puoli hehtaaria sademetsää.",
+        body: [
+          `Yksittäisen kyselyn energiankulutus on pieni. Google mittasi Gemini-sovelluksen tekstikehotteen mediaanikulutukseksi 0,24 wattituntia ([Google Cloud](${L.googleEnergy})), ja Epoch AI arvioi tavallisen ChatGPT-kyselyn vievän noin 0,3 wattituntia, saman verran kuin Googlen vanha arvio yhdestä hausta. Hyvin pitkä syöte nostaa luvun noin 40 wattituntiin ([Epoch AI](${L.epoch})). Hehtaareista ei puhuta missään skenaariossa.`,
+          "Pointti säilyy, mutta se koskee eri tasoa. Alan yhteenlaskettu kulutus ja datakeskusten rakentamistahti ovat iso kysymys, yksittäinen kysely ei.",
+        ],
+      },
+      {
+        time: 725,
+        claim: "Siriin on avattu rajapintoja, ja sen moottoria pystyisi säätämään.",
+        body: [
+          `Puolet pitää paikkansa. Sovellukset voivat tarjota toimintojaan Sirille App Intents -rajapinnalla ([Apple Developer](${L.appIntents})), ja uusi Siri AI käyttää sovellusten toimintoja työkaluina ([MacRumors](${L.ios27})).`,
+          `Moottoria ei voi vaihtaa eikä säätää. Siri AI ajaa Applen Foundation Model -malleja, jotka Apple rakensi yhteistyössä Googlen kanssa Geminin teknologialla, laitteella ja Private Cloud Computessa ([MacRumors](${L.ios27})). Kehittäjä päättää, mitä Siri voi sovelluksessa tehdä, ei sitä, millä mallilla.`,
+        ],
+      },
+      {
+        time: 947,
+        claim: "EU AI Act on syy siihen, ettei uusi Siri tule Eurooppaan.",
+        body: [
+          `Este on digimarkkinasäädös DMA, ei tekoälyasetus. Apple kertoo, että EU:n sääntelijät hylkäsivät kaikki sen ehdottamat ratkaisut, ja että Siri AI jää siksi pois iOS 27:stä, iPadOS 27:stä ja watchOS 27:stä EU:ssa. macOS 27 ja visionOS 27 saavat sen ([Apple Newsroom](${L.siriDma})).`,
+          `AI Act on silti voimassa: korkean riskin järjestelmien velvoitteet alkavat soveltua joulukuussa 2027, mutta muu osa asetuksesta, kuten artiklan 50 läpinäkyvyysvelvoitteet, sovelletaan elokuusta 2026 ([AI Act -aikataulu](${L.aiAct})). Siriin se ei vain liity.`,
+        ],
+      },
+      {
+        time: 970,
+        claim: "Ensimmäisten autojen edessä käveli ihminen punaisen lipun kanssa.",
+        body: [
+          `Laki on brittiläinen Locomotive Act 1865, lempinimeltään Red Flag Act. Se vaati kolmen hengen miehistön, josta yksi käveli vähintään 60 jaardia ajoneuvon edellä punainen lippu kädessä, ja rajoitti nopeuden kahteen mailiin tunnissa kaupungeissa ja neljään maanteillä ([lakiteksti](${L.redFlagAct}), [Wikipedia](${L.redFlag})).`,
+          `Laki kirjoitettiin höyrykäyttöisille maantieajoneuvoille, kaksi vuosikymmentä ennen bensa-autoa. Lippuvaatimus poistui jo 1878, jolloin saattajan piti enää kävellä 20 jaardia edellä. Vuonna 1896 alle kolmen tonnin ajoneuvot vapautettiin saattajasta ja nopeusrajoituksista ([Wikipedia](${L.locomotiveActs})). Britannian ensimmäisten bensa-autojen edellä käveli siis saattaja, mutta ei lippua.`,
+          "Pointti säilyy: sääntely vastasi uuteen teknologiaan hidastamalla sen kävelyvauhtiin.",
+        ],
+      },
+    ],
+    clarifications: [
+      {
+        time: 538,
+        claim: "Käyttäjän toimien ennakointia mallinnettiin agenteissa jo kauan sitten todennäköisyyslaskennalla.",
+        body: [
+          `Pitää paikkansa, ja se oli aikanaan valtavirtaa. Pattie Maesin ryhmä MIT Media Labissa rakensi käyttäjältään oppivia käyttöliittymäagentteja 1990-luvun alussa ([Maes, CACM 1994](${L.maes})), ja Microsoftin Lumière-projekti päätteli bayesilaisella mallilla, mitä käyttäjä oli tekemässä ja mitä hän tarvitsi ([Horvitz ym., UAI 1998](${L.lumiere})).`,
+          "Lumièren prototyypit olivat Office 97:n avustajan, Clippyn, pohjana. Sama idea kuin ambienteissa agenteissa, eri moottorilla.",
+        ],
+      },
+      {
+        time: 768,
+        claim: "GPT Live 1 tuli ulos eilen tai edellispäivänä.",
+        body: [
+          `Käytännössä oikein. GPT-Live-1 tuli yleisesti saataville API:ssa 10.9.2026, eli kolme päivää ennen nauhoitusta ([OpenAI](${L.gptLive})).`,
+          "Malli kuuntelee ja puhuu yhtä aikaa, ja se voi delegoida raskaamman päättelyn taustalla toiselle mallille kesken keskustelun. Äänikerros maksaa 0,05 dollaria minuutilta, ja käytetty päättelymalli laskutetaan erikseen.",
+        ],
+      },
+      {
+        time: 837,
+        claim: "Applen mallit ovat Google-pohjaisia, ja isot mallit pyörivät pilvessä.",
+        body: [
+          `Kuvaus on oikea. Siri AI ajaa Applen Foundation Model -malleja, jotka Apple rakensi yhteistyössä Googlen kanssa Geminin teknologialla. Pyynnöt käsitellään laitteella tai Applen Private Cloud Computessa, ja Apple on laajentamassa Apple Intelligencen ajoa myös Google Cloudiin ([MacRumors](${L.ios27})).`,
+          "Jaksossa palvelu mainitaan nimellä ”Pilvi Private Cloud”. Oikea nimi on Private Cloud Compute.",
+        ],
+      },
+      {
+        time: 1002,
+        claim: "Suomeen on tulossa vihreät rekisterikilvet takseihin.",
+        body: [
+          `Totta, ja uutinen oli nauhoitushetkellä kolme päivää vanha. Valtioneuvosto antoi asetusmuutoksen 10.9.2026: taksien rekisterikilpien pohja muuttuu vihreäksi ja tunnus on musta ([LVM](${L.lvm})).`,
+          `Muutos tulee voimaan 1.1.2027, ja vihreät kilvet ovat takseissa pakollisia 1.7.2027 ([Yle](${L.yleTaxi})).`,
+        ],
+      },
+      {
+        time: 1095,
+        claim: "Tietotyö on ihmiskunnan historiassa uusi ilmiö.",
+        body: [
+          `Jaksossa päädytään itse oikeaan muotoiluun: tietotyötä on tehty aina, mutta tietokoneella tehtävä tietotyö on uutta. Käsite knowledge worker on peräisin Peter Druckerin kirjasta The Landmarks of Tomorrow vuodelta 1959 ([Wikipedia](${L.drucker})).`,
+          `Mesopotamiasta on löydetty yli 7 000 vuotta vanhoja kirjanpitomerkintöjä ([Wikipedia](${L.accounting})), joten jakson savitauluvitsi osuu lähemmäs kuin miltä kuulostaa.`,
+        ],
+      },
+    ],
+    glossary: [
+      {
+        term: "Ambientti agentti",
+        text: "Agentti, jota ei käynnistetä kehotteella, vaan se reagoi itse johonkin tapahtumaan tai datavirtaan. Useimmat nykyiset agentit ovat joko ajastettuja tai käsin käynnistettyjä.",
+      },
+      {
+        term: "App Intents",
+        text: `Applen rajapinta, jolla sovellus kuvaa toimintonsa järjestelmälle, jolloin Siri ja Pikakomennot voivat käyttää niitä ([Apple Developer](${L.appIntents})).`,
+      },
+      {
+        term: "Beta-jakauma",
+        text: `Todennäköisyysjakauma välillä 0–1, jolla mallinnetaan epävarmuutta jostakin osuudesta tai todennäköisyydestä, esimerkiksi siitä, kuinka todennäköisesti käyttäjä tekee jotain tiettyyn aikaan ([Wikipedia](${L.beta})).`,
+      },
+      {
+        term: "DMA",
+        text: `EU:n digimarkkinasäädös, joka velvoittaa suuret alustayhtiöt avaamaan järjestelmiään kilpailijoille. Eri säädös kuin tekoälyasetus AI Act ([Euroopan komissio](${L.dma})).`,
+      },
+      {
+        term: "Full-duplex",
+        text: `Puhemalli kuuntelee ja puhuu yhtä aikaa, kuten ihminen puhelimessa, eikä odota vuoroaan. GPT-Live on tällainen malli ([OpenAI](${L.gptLive})).`,
+      },
+      {
+        term: "Private Cloud Compute",
+        text: `Applen oma palvelinympäristö niille Apple Intelligence -pyynnöille, jotka eivät mahdu laitteelle. Applen mukaan dataa ei säilytetä vastauksen jälkeen eikä se ole Applen saatavilla, ja ulkopuoliset tutkijat voivat tarkastaa järjestelmän ([Apple Security Research](${L.pcc})).`,
+      },
+    ],
+    sources: [
+      `[How much energy does Google's AI use? We did the math](${L.googleEnergy}), Google Cloud, 21.8.2025`,
+      `[How much energy does ChatGPT use?](${L.epoch}), Epoch AI, 7.2.2025`,
+      `[GPT-Live-1 in the API](${L.gptLive}), OpenAI, 10.9.2026`,
+      `[Due to DMA, Siri AI delayed in EU for iOS 27 and iPadOS 27](${L.siriDma}), Apple Newsroom, kesäkuu 2026`,
+      `[iOS 27: Everything We Know](${L.ios27}), MacRumors`,
+      `[App Intents](${L.appIntents}), Apple Developer`,
+      `[Private Cloud Compute](${L.pcc}), Apple Security Research`,
+      `[EU AI Act -aikataulu](${L.aiAct})`,
+      `[Digital Markets Act](${L.dma}), Euroopan komissio`,
+      `[Locomotive Act 1865](${L.redFlagAct}), legislation.gov.uk; [Red flag traffic laws](${L.redFlag}) ja [Locomotive Acts](${L.locomotiveActs}), Wikipedia`,
+      `Taksien vihreät rekisterikilvet: [LVM](${L.lvm}), 10.9.2026, ja [Yle](${L.yleTaxi})`,
+      `Maes, [”Agents that reduce work and information overload”](${L.maes}), Communications of the ACM 37(7), 1994`,
+      `Horvitz ym., [”The Lumière Project: Bayesian User Modeling for Inferring the Goals and Needs of Software Users”](${L.lumiere}), UAI 1998`,
+      `[The Landmarks of Tomorrow](${L.drucker}) ja [History of accounting](${L.accounting}), Wikipedia`,
     ],
   },
 };

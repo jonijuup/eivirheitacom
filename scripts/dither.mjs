@@ -123,7 +123,10 @@ async function dither(src, { width, crop, style = STYLE, tone, out }) {
 
 // --- What the site needs --------------------------------------------------
 
-const EPISODES = [{ id: "01", src: "media/episodes/01.png" }];
+const EPISODES = [
+  { id: "01", src: "media/episodes/01.png" },
+  { id: "02", src: "media/episodes/02.png" },
+];
 
 /** Faces are lit against black: darker and harder than the full artwork, so they keep their features. */
 const PORTRAIT = { gamma: 1.15, contrast: 1.4 };

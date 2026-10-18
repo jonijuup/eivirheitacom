@@ -105,7 +105,15 @@ ${facts(e)}
 ## Aiheet
 
 ${e.topics.map((t) => `- ${t}`).join("\n")}
+${
+  e.chapters
+    ? `
+## Luvut
 
+${e.chapters.map((c) => `- ${e.links?.youtube ? `[${timestamp(c.time)}](${e.links.youtube}&t=${c.time}s)` : timestamp(c.time)} ${c.title}`).join("\n")}
+`
+    : ""
+}
 ## Kuuntele
 
 ${listen(e)}
